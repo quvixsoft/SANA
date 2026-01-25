@@ -120,3 +120,14 @@ GoogleService-Info.plist
 # Environment Variables
 # =========================
 .env
+
+# Ignorar archivos generados de plugins para escritorio
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+linux/flutter/generated_plugins.cmake
+
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+windows/flutter/generated_plugins.cmake
+
+macos/Flutter/GeneratedPluginRegistrant.swift
