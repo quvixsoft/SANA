@@ -1,35 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-
-class SlideInfo {
-  final String title;
-  final String caption; // "Tu Asistente de Salud" etc
-  final String description;
-  final IconData icon;
-
-  SlideInfo(this.title, this.caption, this.description, this.icon);
-}
-
-final slides = <SlideInfo>[
-  SlideInfo(
-    'Bienvenido a SANA-IA',
-    'Tu Asistente de Salud',
-    'Diagnósticos rápidos,\nprecisos y personalizados.',
-    Icons.security_outlined,
-  ),
-  SlideInfo(
-    'Describe tus Síntomas',
-    'Chat de Síntomas',
-    'Chatea con nuestra IA\nResponde preguntas sencillas\npara el análisis preliminar.', // Grammar from image: "para la análisis" (sic)
-    Icons.psychology_outlined,
-  ),
-  SlideInfo(
-    'Obtén Recomendaciones',
-    'Paso 2: Obtén',
-    'Recibe orientación y asesoría\nNo reemplaza un médico, pero\nda información valiosa.',
-    Icons.assignment_outlined,
-  ),
-];
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../../core/config/theme/app_theme.dart';
 
 class OnboardingScreen extends StatefulWidget {
   static const name = 'onboarding_screen';
@@ -41,228 +13,278 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
-  bool endReached = false;
+  int _currentStep = 0;
 
-  @override
-  void initState() {
-    super.initState();
-    _pageController.addListener(() {
-      final page = _pageController.page ?? 0;
-      if (!endReached && page >= (slides.length - 1.5)) {
-        setState(() {
-          endReached = true;
-        });
+  final List<Map<String, dynamic>> _steps = [
+    {
+      "title": "Análisis Científico",
+      "description":
+          "Validamos tus síntomas cruzándolos con datos duros de laboratorio mediante nuestro motor de inferencia clínica.",
+      "icon": Icons.biotech,
+      "color": AppColors.primary,
+    },
+    {
+      "title": "Motor de Inferencia",
+      "description":
+          "Analizamos tus síntomas con lógica de ingeniería avanzada para encontrar la causa raíz de tu problema de salud.",
+      "icon": Icons.psychology,
+      "color": AppColors.primary,
+    },
+    {
+      "title": "Reporte de Ingeniería Médica",
+      "description":
+          "Sana genera un análisis técnico detallado en PDF que puedes compartir directamente con tu médico.",
+      "icon": Icons.description,
+      "color": AppColors.successGreen,
+    },
+  ];
+
+  void _handleNext() async {
+    if (_currentStep < _steps.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeIn,
+      );
+    } else {
+      // Mark onboarding as completed
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('has_completed_onboarding', true);
+      if (mounted) {
+        context.go('/login');
       }
-    });
+    }
   }
 
-  @override
-  void dispose() {
-    _pageController.dispose();
-    super.dispose();
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentStep = index;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Stack(
+      backgroundColor: AppColors.darkNavy,
+      body: Column(
         children: [
-          PageView(
-            controller: _pageController,
-            physics: const BouncingScrollPhysics(),
-            children: slides
-                .map(
-                  (slide) => _Slide(
-                    title: slide.title,
-                    caption: slide.caption,
-                    description: slide.description,
-                    icon: slide.icon,
-                  ),
-                )
-                .toList(),
-          ),
-          Positioned(
-            bottom: 30,
-            left: 30,
-            right: 30,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Dots
-                Builder(
-                  builder: (context) {
-                    // We need a simple AnimatedBuilder to repaint dots or use setState.
-                    // Since I used a listener to set state only at end, dots won't update?
-                    // I should use AnimatedBuilder for dots or setState on page change.
-                    return AnimatedBuilder(
-                      animation: _pageController,
-                      builder: (context, _) {
-                        double page = _pageController.hasClients
-                            ? (_pageController.page ?? 0)
-                            : 0;
-                        int currentPage = page.round();
+          // Header Section (Dark Blue)
+          Expanded(
+            flex: 3,
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                color: AppColors.darkNavy,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(40),
+                  bottomRight: Radius.circular(40),
+                ),
+              ),
+              child: SafeArea(
+                bottom: false,
+                child: Column(
+                  children: [
+                    // Top Logo Bar
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16, bottom: 20),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: 32,
+                            height: 32,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.small,
+                              ),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.2),
+                              ),
+                            ),
+                            child: const Icon(
+                              Icons.medical_services,
+                              color: Colors.white,
+                              size: 18,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Sana',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: -0.5,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
 
-                        return Row(
+                    // Centered Illustration Icon
+                    Expanded(
+                      child: Center(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 300),
+                          child: Container(
+                            key: ValueKey<int>(_currentStep),
+                            width: 140,
+                            height: 140,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withOpacity(0.05),
+                              border: Border.all(
+                                color: Colors.white.withOpacity(0.1),
+                              ),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                _steps[_currentStep]['icon'],
+                                size: 60,
+                                color: _steps[_currentStep]["color"],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Content Section (White)
+          Expanded(
+            flex: 5,
+            child: Container(
+              decoration: const BoxDecoration(color: Colors.white),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: _onPageChanged,
+                      itemCount: _steps.length,
+                      itemBuilder: (context, index) {
+                        final step = _steps[index];
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 40),
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const SizedBox(height: 40),
+                                Text(
+                                  step['title'],
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.w800,
+                                    color: AppColors.darkNavy,
+                                    letterSpacing: -0.5,
+                                    height: 1.2,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  step['description'],
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: AppColors.grey,
+                                    height: 1.5,
+                                  ),
+                                ),
+                                const SizedBox(height: 20),
+                              ],
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  ),
+
+                  // Footer Controls
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(32, 0, 32, 50),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Indicators
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.center,
-                          children: List.generate(slides.length, (index) {
+                          children: List.generate(_steps.length, (index) {
                             return AnimatedContainer(
                               duration: const Duration(milliseconds: 300),
-                              margin: const EdgeInsets.symmetric(horizontal: 5),
-                              width: (index == currentPage) ? 12 : 8,
-                              height: 8,
+                              margin: const EdgeInsets.symmetric(horizontal: 4),
+                              width: index == _currentStep ? 32 : 10,
+                              height: 10,
                               decoration: BoxDecoration(
-                                color: (index == currentPage)
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.grey.shade300,
-                                shape: BoxShape.circle,
+                                color: index == _currentStep
+                                    ? AppColors.primary
+                                    : AppColors.grey200,
+                                borderRadius: BorderRadius.circular(5),
                               ),
                             );
                           }),
-                        );
-                      },
-                    );
-                  },
-                ),
-
-                const SizedBox(height: 30),
-
-                AnimatedBuilder(
-                  animation: _pageController,
-                  builder: (context, child) {
-                    double page = _pageController.hasClients
-                        ? (_pageController.page ?? 0)
-                        : 0;
-                    bool isLast = page >= 1.5; // Simple check for slide 3
-
-                    return FilledButton(
-                      onPressed: () {
-                        if (isLast) {
-                          context.go('/login');
-                        } else {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 500),
-                            curve: Curves.easeIn,
-                          );
-                        }
-                      },
-                      style: FilledButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 50),
-                      ),
-                      child: Text(isLast ? 'Empezar' : 'Siguiente'),
-                    );
-                  },
-                ),
-
-                const SizedBox(height: 10),
-
-                TextButton(
-                  onPressed: () {
-                    context.go('/login');
-                  },
-                  child: const Text('Omitir'), // Using a cleaner text
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _Slide extends StatelessWidget {
-  final String title;
-  final String caption;
-  final String description;
-  final IconData icon;
-
-  const _Slide({
-    required this.title,
-    required this.caption,
-    required this.description,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final titleStyle = Theme.of(context).textTheme.titleLarge?.copyWith(
-      color: const Color(0xFF1E293B), // Dark blue/grey
-      fontWeight: FontWeight.bold,
-    );
-    final captionStyle = Theme.of(context).textTheme.titleMedium?.copyWith(
-      color: const Color(0xFF334155),
-      fontWeight: FontWeight.w600,
-    );
-    final descStyle = Theme.of(
-      context,
-    ).textTheme.bodyMedium?.copyWith(color: const Color(0xFF64748B));
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 30),
-      child: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            // Top Title (Only checking if slide has top title or center title?)
-            // Image 1: Top: Bienvenido...
-            // Image 2: Top Banner: "Describe tus Síntomas" (Dark bar) - Wait looking at image 2.
-            // Image 2 has a Dark Blue Bar at top with "Describe tus Síntomas".
-            // Image 3 has a Dark Blue Bar at top with "Obtén Recomendaciones".
-            // Image 1 does NOT have a top bar, just text "Bienvenido/a a Medi-IA".
-
-            // Refinement: The design is slightly different per slide.
-            // Slide 1: No AppBar. Title in body.
-            // Slide 2: AppBar-like top bar.
-            // Slide 3: AppBar-like top bar.
-
-            // To keep it simple in one Generic Slide widget, I'll put the top title in the body for now,
-            // or I conditionally show an AppBar-like container?
-            // The user said "enfocandote en el color que estoy usando".
-            // Adding a dark blue header for slide 2 and 3 would match the design better.
-
-            // Let's adjust the _Slide widget to handle the Title position.
-            // Actually, `PageView` is usually full screen.
-            // If I want to match exactly, I should check if title is "AppBar" style or "Body" style.
-
-            // For now, I will render simply centered content.
-            // Re-reading image 2/3: The dark bar looks like an AppBar.
-            // But PageView is inside Scaffold body usually.
-            // I'll stick to a simple clean layout first. If needed I can add the header bar.
-            Text(title, style: titleStyle, textAlign: TextAlign.center),
-            const SizedBox(height: 40),
-            Container(
-              width: 200,
-              height: 200,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: Colors.blue.withValues(alpha: 0.3),
-                  width: 2,
-                ), // Light blue border
-
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.blue.withValues(alpha: 0.1),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
+                        ),
+                        const SizedBox(height: 40),
+                        // Buttons
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            TextButton(
+                              onPressed: () => context.go('/login'),
+                              child: const Text(
+                                'Omitir',
+                                style: TextStyle(
+                                  color: AppColors.grey,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            ElevatedButton(
+                              onPressed: _handleNext,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 32,
+                                  vertical: 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.large,
+                                  ),
+                                ),
+                                elevation: 4,
+                              ),
+                              child: const Row(
+                                children: [
+                                  Text(
+                                    'Siguiente',
+                                    style: TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Icon(Icons.arrow_forward, size: 20),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 10),
+                      ],
+                    ),
                   ),
                 ],
               ),
-              child: Icon(
-                icon,
-                size: 80,
-                color: Theme.of(context).primaryColor,
-              ),
             ),
-            const SizedBox(height: 40),
-            Text(caption, style: captionStyle, textAlign: TextAlign.center),
-            const SizedBox(height: 10),
-            Text(description, style: descStyle, textAlign: TextAlign.center),
-            const SizedBox(height: 100), // Space for buttons
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
