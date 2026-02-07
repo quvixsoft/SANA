@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatelessWidget {
   static const name = 'login_screen';
@@ -33,20 +32,20 @@ class LoginScreen extends StatelessWidget {
               'Iniciar Sesión',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: const Color(0xFF1E293B),
-                    fontWeight: FontWeight.bold,
-                  ),
+                color: const Color(0xFF1E293B),
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 10),
             Text(
               'Bienvenido de nuevo',
               textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: const Color(0xFF64748B),
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(color: const Color(0xFF64748B)),
             ),
             const SizedBox(height: 50),
-            
+
             // Email Field
             TextFormField(
               decoration: InputDecoration(
@@ -62,7 +61,7 @@ class LoginScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            
+
             // Password Field
             TextFormField(
               obscureText: true,
@@ -79,7 +78,7 @@ class LoginScreen extends StatelessWidget {
                 ),
               ),
             ),
-            
+
             const SizedBox(height: 10),
             Align(
               alignment: Alignment.centerRight,
@@ -88,15 +87,17 @@ class LoginScreen extends StatelessWidget {
                 child: const Text('¿Olvidaste tu contraseña?'),
               ),
             ),
-            
+
             const SizedBox(height: 30),
-            
+
             FilledButton(
               onPressed: () {
-                // Navigate to standard Home or Dashboard? 
+                // Navigate to standard Home or Dashboard?
                 // For now, staying here or maybe showing a snackbar.
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Login functionality not implemented yet')),
+                  const SnackBar(
+                    content: Text('Login functionality not implemented yet'),
+                  ),
                 );
               },
               style: FilledButton.styleFrom(
@@ -107,17 +108,17 @@ class LoginScreen extends StatelessWidget {
               ),
               child: const Text('Entrar', style: TextStyle(fontSize: 16)),
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Text('¿No tienes cuenta?', style: TextStyle(color: Color(0xFF64748B))),
-                TextButton(
-                  onPressed: () {},
-                  child: const Text('Regístrate'),
+                const Text(
+                  '¿No tienes cuenta?',
+                  style: TextStyle(color: Color(0xFF64748B)),
                 ),
+                TextButton(onPressed: () {}, child: const Text('Regístrate')),
               ],
             ),
           ],
