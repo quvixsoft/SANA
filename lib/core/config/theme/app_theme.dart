@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// Sana Design System
-/// Centralized theme constants for the application
-
 class AppColors {
   // Primary Colors
   static const Color primary = Color(0xFF1E82D9);
