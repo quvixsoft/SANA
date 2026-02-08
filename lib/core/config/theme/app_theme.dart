@@ -189,31 +189,3 @@ class AppShadows {
     ),
   ];
 }
-
-class AppTheme {
-  ThemeData getTheme() {
-    return ThemeData(
-      useMaterial3: true,
-      colorSchemeSeed: AppColors.primary,
-      scaffoldBackgroundColor: AppColors.background,
-      appBarTheme: const AppBarTheme(
-        centerTitle: false,
-        backgroundColor: Colors.white,
-        elevation: 0,
-      ),
-      filledButtonTheme: FilledButtonThemeData(
-        style: FilledButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.large),
-          ),
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-        ),
-      ),
-      textButtonTheme: TextButtonThemeData(
-        style: TextButton.styleFrom(foregroundColor: AppColors.primary),
-      ),
-    );
-  }
-}

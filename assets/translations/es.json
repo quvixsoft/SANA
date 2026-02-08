@@ -1,0 +1,43 @@
+{
+  "app": {
+    "name": "Sana",
+    "subtitle": "Sistema de Análisis de Necesidades Asistidas"
+  },
+  "onboarding": {
+    "skip": "Omitir",
+    "next": "Siguiente",
+    "step1": {
+      "title": "Bienvenido a SANA",
+      "description": "Tu Asistente de Salud, Diagnósticos rápidos, precisos y personalizados."
+    },
+    "step2": {
+      "title": "Describe tus Síntomas",
+      "description": "Chatea con nuestra IA. Responde preguntas sencillas para el análisis preliminar."
+    },
+    "step3": {
+      "title": "Obtén Recomendaciones",
+      "description": "Recibe orientación y asesoría. No reemplaza un médico, pero da información valiosa."
+    }
+  },
+
+  "login": {
+    "title": "Iniciar Sesión",
+    "email": "Correo Electrónico",
+    "email_placeholder": "nombre@ejemplo.com",
+    "password": "Contraseña",
+    "password_placeholder": "••••••••",
+    "forgot_password": "¿Olvidaste tu contraseña?",
+    "login_button": "INICIAR SESIÓN",
+    "or_continue_with": "O CONTINÚA CON",
+    "google_login": "Continuar con Google",
+    "no_account": "¿No tienes cuenta? ",
+    "create_account": "Crear cuenta",
+    "biometric_prompt": "Por favor autentícate para ingresar a Sana",
+    "biometric_tooltip": "Usar Huella Digital",
+    "enable_biometric_title": "Activar Huella Dactilar",
+    "enable_biometric_message": "¿Quieres usar tu huella para iniciar sesión la próxima vez?",
+    "yes_enable": "Sí, activar",
+    "no": "No",
+    "login_success": "Login exitoso"
+  }
+}

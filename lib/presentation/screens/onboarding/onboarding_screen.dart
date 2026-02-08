@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:sana/core/config/theme/app_theme.dart';
+import 'package:sana/presentation/screens/auth/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/config/theme/app_theme.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:sana/presentation/widgets/share/selector/language_selector.dart';
 
 class OnboardingScreen extends StatefulWidget {
   static const name = 'onboarding_screen';
@@ -15,26 +18,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentStep = 0;
 
-  final List<Map<String, dynamic>> _steps = [
+  // Steps cargados dinámicamente según el idioma
+  List<Map<String, dynamic>> get _steps => [
     {
-      "title": "Análisis Científico",
-      "description":
-          "Validamos tus síntomas cruzándolos con datos duros de laboratorio mediante nuestro motor de inferencia clínica.",
-      "icon": Icons.biotech,
+      "title": "onboarding.step1.title".tr(),
+      "description": "onboarding.step1.description".tr(),
+      "icon": Icons.security_outlined,
       "color": AppColors.primary,
     },
     {
-      "title": "Motor de Inferencia",
-      "description":
-          "Analizamos tus síntomas con lógica de ingeniería avanzada para encontrar la causa raíz de tu problema de salud.",
-      "icon": Icons.psychology,
+      "title": "onboarding.step2.title".tr(),
+      "description": "onboarding.step2.description".tr(),
+      "icon": Icons.psychology_outlined,
       "color": AppColors.primary,
     },
     {
-      "title": "Reporte de Ingeniería Médica",
-      "description":
-          "Sana genera un análisis técnico detallado en PDF que puedes compartir directamente con tu médico.",
-      "icon": Icons.description,
+      "title": "onboarding.step3.title".tr(),
+      "description": "onboarding.step3.description".tr(),
+      "icon": Icons.assignment_outlined,
       "color": AppColors.successGreen,
     },
   ];
@@ -50,7 +51,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool('has_completed_onboarding', true);
       if (mounted) {
-        context.go('/login');
+        context.go(LoginScreen.routePath);
       }
     }
   }
@@ -63,7 +64,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    // Force rebuild when locale changes
+    final currentLocale = context.locale;
+
     return Scaffold(
+      key: ValueKey(currentLocale),
       backgroundColor: AppColors.darkNavy,
       body: Column(
         children: [
@@ -85,38 +90,49 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   children: [
                     // Top Logo Bar
                     Padding(
-                      padding: const EdgeInsets.only(top: 16, bottom: 20),
+                      padding: const EdgeInsets.only(
+                        top: 16,
+                        bottom: 20,
+                        left: 24,
+                        right: 24,
+                      ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Container(
-                            width: 32,
-                            height: 32,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(
-                                AppRadius.small,
+                          Row(
+                            children: [
+                              Container(
+                                width: 32,
+                                height: 32,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withValues(alpha: 0.1),
+                                  borderRadius: BorderRadius.circular(
+                                    AppRadius.small,
+                                  ),
+                                  border: Border.all(
+                                    color: Colors.white.withValues(alpha: 0.2),
+                                  ),
+                                ),
+                                child: const Icon(
+                                  Icons.medical_services,
+                                  color: Colors.white,
+                                  size: 18,
+                                ),
                               ),
-                              border: Border.all(
-                                color: Colors.white.withOpacity(0.2),
+                              const SizedBox(width: 8),
+                              const Text(
+                                'Sana',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: -0.5,
+                                ),
                               ),
-                            ),
-                            child: const Icon(
-                              Icons.medical_services,
-                              color: Colors.white,
-                              size: 18,
-                            ),
+                            ],
                           ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            'Sana',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
+                          // Language Selector
+                          const LanguageSelector(),
                         ],
                       ),
                     ),
@@ -132,9 +148,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             height: 140,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Colors.white.withOpacity(0.05),
+                              color: Colors.white.withValues(alpha: 0.05),
                               border: Border.all(
-                                color: Colors.white.withOpacity(0.1),
+                                color: Colors.white.withValues(alpha: 0.1),
                               ),
                             ),
                             child: Center(
@@ -236,10 +252,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             TextButton(
-                              onPressed: () => context.go('/login'),
-                              child: const Text(
-                                'Omitir',
-                                style: TextStyle(
+                              onPressed: () =>
+                                  context.go(LoginScreen.routePath),
+                              child: Text(
+                                'onboarding.skip'.tr(),
+                                style: const TextStyle(
                                   color: AppColors.grey,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -261,16 +278,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 ),
                                 elevation: 4,
                               ),
-                              child: const Row(
+                              child: Row(
                                 children: [
                                   Text(
-                                    'Siguiente',
-                                    style: TextStyle(
+                                    'onboarding.next'.tr(),
+                                    style: const TextStyle(
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                  SizedBox(width: 8),
-                                  Icon(Icons.arrow_forward, size: 20),
+                                  const SizedBox(width: 8),
+                                  const Icon(Icons.arrow_forward, size: 20),
                                 ],
                               ),
                             ),

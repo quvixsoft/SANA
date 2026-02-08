@@ -1,10 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
+import 'package:sana/core/config/theme/app_theme.dart';
+import 'package:sana/presentation/screens/dashboard/dashboard_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/config/theme/app_theme.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends StatefulWidget {
-  static const name = 'login_screen';
+  static const String routePath = '/auth/login';
+  static const String routeName = 'login';
+
   const LoginScreen({super.key});
 
   @override
@@ -14,6 +19,15 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   final LocalAuthentication auth = LocalAuthentication();
   bool _canCheckBiometrics = false;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -50,9 +64,10 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _authenticate() async {
     try {
       final bool didAuthenticate = await auth.authenticate(
-        localizedReason: 'Por favor autentícate para ingresar a Sana',
+        localizedReason: 'login.biometric_prompt'.tr(),
       );
       if (didAuthenticate) {
+        if (!mounted) return;
         _onLoginSuccess();
       }
     } catch (e) {
@@ -62,13 +77,20 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onLoginSuccess() {
-    // Navigate to home or show success
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Login exitoso')));
+    if (mounted) {
+      context.go(Dashboard.routePath);
+    }
   }
 
   Future<void> _handleLogin() async {
+    // Simulate validation
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Por favor llena todos los campos')),
+      );
+      return;
+    }
+
     // Simulate Login Success
     final prefs = await SharedPreferences.getInstance();
     final bool useBiometrics = prefs.getBool('use_biometrics') ?? false;
@@ -79,25 +101,25 @@ class _LoginScreenState extends State<LoginScreen> {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text("Activar Huella Dactilar"),
-          content: const Text(
-            "¿Quieres usar tu huella para iniciar sesión la próxima vez?",
-          ),
+          title: Text('login.enable_biometric_title'.tr()),
+          content: Text('login.enable_biometric_message'.tr()),
           actions: [
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
                 _onLoginSuccess();
               },
-              child: const Text("No"),
+              child: Text('login.no'.tr()),
             ),
             TextButton(
               onPressed: () async {
                 await prefs.setBool('use_biometrics', true);
-                Navigator.pop(context);
-                _onLoginSuccess();
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  _onLoginSuccess();
+                }
               },
-              child: const Text("Sí, activar"),
+              child: Text('login.yes_enable'.tr()),
             ),
           ],
         ),
@@ -146,23 +168,25 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 40),
-
-                const Text(
-                  'Sana',
-                  style: TextStyle(
+                Text(
+                  'app.name'.tr(),
+                  style: const TextStyle(
                     fontSize: 36,
                     fontWeight: FontWeight.w900,
                     color: AppColors.darkNavy,
                     letterSpacing: -1,
                   ),
                 ),
-                const Text(
-                  'Motor de Inferencia Clínica',
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.grey,
-                    fontWeight: FontWeight.w500,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
+                  child: Text(
+                    'app.subtitle'.tr(),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: AppColors.grey,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
 
@@ -172,14 +196,16 @@ class _LoginScreenState extends State<LoginScreen> {
                 Column(
                   children: [
                     _buildTextField(
-                      label: 'Correo Electrónico',
-                      placeholder: 'nombre@ejemplo.com',
+                      controller: _emailController,
+                      label: 'login.email'.tr(),
+                      placeholder: 'login.email_placeholder'.tr(),
                       icon: Icons.email,
                     ),
                     const SizedBox(height: 16),
                     _buildTextField(
-                      label: 'Contraseña',
-                      placeholder: '••••••••',
+                      controller: _passwordController,
+                      label: 'login.password'.tr(),
+                      placeholder: 'login.password_placeholder'.tr(),
                       icon: Icons.lock,
                       isPassword: true,
                     ),
@@ -190,9 +216,9 @@ class _LoginScreenState extends State<LoginScreen> {
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {},
-                        child: const Text(
-                          '¿Olvidaste tu contraseña?',
-                          style: TextStyle(
+                        child: Text(
+                          'login.forgot_password'.tr(),
+                          style: const TextStyle(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
                           ),
@@ -217,15 +243,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           elevation: 4,
                         ),
-                        child: const Row(
+                        child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'INICIAR SESIÓN',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                              'login.login_button'.tr(),
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                            SizedBox(width: 8),
-                            Icon(Icons.arrow_forward, size: 20),
+                            const SizedBox(width: 8),
+                            const Icon(Icons.arrow_forward, size: 20),
                           ],
                         ),
                       ),
@@ -242,7 +270,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: Text(
-                        'O CONTINÚA CON',
+                        'login.or_continue_with'.tr(),
                         style: TextStyle(
                           fontSize: 10,
                           fontWeight: FontWeight.w900,
@@ -286,9 +314,9 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(width: 12),
-                      const Text(
-                        'Continuar con Google',
-                        style: TextStyle(
+                      Text(
+                        'login.google_login'.tr(),
+                        style: const TextStyle(
                           color: AppColors.darkNavy,
                           fontWeight: FontWeight.bold,
                         ),
@@ -306,7 +334,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       color: AppColors.primary,
                     ),
                     onPressed: _authenticate,
-                    tooltip: 'Usar Huella Digital',
+                    tooltip: 'login.biometric_tooltip'.tr(),
                   ),
                 ],
 
@@ -315,14 +343,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
-                      '¿No tienes cuenta? ',
+                    Text(
+                      'login.no_account'.tr(),
                       style: TextStyle(color: AppColors.grey),
                     ),
                     TextButton(
                       onPressed: () {},
-                      child: const Text(
-                        'Crear cuenta',
+                      child: Text(
+                        'login.create_account'.tr(),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
@@ -340,6 +368,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildTextField({
+    required TextEditingController controller,
     required String label,
     required String placeholder,
     required IconData icon,
@@ -353,6 +382,7 @@ class _LoginScreenState extends State<LoginScreen> {
         boxShadow: AppShadows.subtle,
       ),
       child: TextField(
+        controller: controller,
         obscureText: isPassword,
         decoration: InputDecoration(
           labelText: label,
