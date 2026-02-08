@@ -1,8 +1,13 @@
 import 'package:go_router/go_router.dart';
 import 'package:sana/presentation/layouts/app_layout.dart';
 import 'package:sana/presentation/layouts/auth_layout.dart';
+import 'package:sana/presentation/screens/auth/forgot_password_screen.dart';
 import 'package:sana/presentation/screens/auth/login_screen.dart';
-import 'package:sana/presentation/screens/dashboard/dashboard_screen.dart';
+import 'package:sana/presentation/screens/auth/register_screen.dart';
+import 'package:sana/presentation/screens/dashboard/home/home_screen.dart';
+import 'package:sana/presentation/screens/dashboard/history/history_screen.dart';
+import 'package:sana/presentation/screens/dashboard/labs/labs_screen.dart';
+import 'package:sana/presentation/screens/dashboard/profile/profile_screen.dart';
 import 'package:sana/presentation/screens/onboarding/onboarding_screen.dart';
 
 final appRouter = GoRouter(
@@ -13,12 +18,6 @@ final appRouter = GoRouter(
       name: OnboardingScreen.name,
       builder: (context, state) => OnboardingScreen(),
     ),
-
-    // GoRoute(
-    //   path: '/dashboard',
-    //   name: Dashboard.name,
-    //   builder: (context, state) => const Dashboard(),
-    // ),
 
     /// StatefulShellRoute para autenticación (Login, Registro)
     StatefulShellRoute.indexedStack(
@@ -35,6 +34,16 @@ final appRouter = GoRouter(
               name: LoginScreen.routeName,
               builder: (context, state) => const LoginScreen(),
             ),
+            GoRoute(
+              path: ForgotPasswordScreen.routePath,
+              name: ForgotPasswordScreen.routeName,
+              builder: (context, state) => const ForgotPasswordScreen(),
+            ),
+            GoRoute(
+              path: RegisterScreen.routePath,
+              name: RegisterScreen.routeName,
+              builder: (context, state) => const RegisterScreen(),
+            ),
           ],
         ),
       ],
@@ -50,9 +59,9 @@ final appRouter = GoRouter(
         StatefulShellBranch(
           routes: <RouteBase>[
             GoRoute(
-              path: Dashboard.routePath,
-              name: Dashboard.routeName,
-              builder: (context, state) => const Dashboard(),
+              path: HomeScreen.routePath,
+              name: HomeScreen.routeName,
+              builder: (context, state) => const HomeScreen(),
             ),
           ],
         ),
@@ -60,9 +69,9 @@ final appRouter = GoRouter(
         StatefulShellBranch(
           routes: <RouteBase>[
             GoRoute(
-              path: '/history',
-              name: 'history',
-              builder: (context, state) => const Dashboard(),
+              path: HistoryScreen.routePath,
+              name: HistoryScreen.routeName,
+              builder: (context, state) => const HistoryScreen(),
             ),
           ],
         ),
@@ -72,7 +81,8 @@ final appRouter = GoRouter(
             GoRoute(
               path: '/chat',
               name: 'chat',
-              builder: (context, state) => const Dashboard(),
+              builder: (context, state) =>
+                  const HomeScreen(), // Placeholder for chat if needed, OR keep as is
             ),
           ],
         ),
@@ -80,9 +90,9 @@ final appRouter = GoRouter(
         StatefulShellBranch(
           routes: <RouteBase>[
             GoRoute(
-              path: '/labs',
-              name: 'labs',
-              builder: (context, state) => const Dashboard(),
+              path: LabsScreen.routePath,
+              name: LabsScreen.routeName,
+              builder: (context, state) => const LabsScreen(),
             ),
           ],
         ),
@@ -90,9 +100,9 @@ final appRouter = GoRouter(
         StatefulShellBranch(
           routes: <RouteBase>[
             GoRoute(
-              path: '/profile',
-              name: 'profile',
-              builder: (context, state) => const Dashboard(),
+              path: ProfileScreen.routePath,
+              name: ProfileScreen.routeName,
+              builder: (context, state) => ProfileScreen(),
             ),
           ],
         ),

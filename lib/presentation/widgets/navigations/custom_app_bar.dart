@@ -14,6 +14,12 @@ class CustomAppBar extends ConsumerWidget implements PreferredSizeWidget {
       shadowColor: Colors.transparent,
       surfaceTintColor: Colors.transparent,
       centerTitle: true,
+      leading: Builder(
+        builder: (context) => IconButton(
+          icon: const Icon(Icons.menu, color: Colors.white),
+          onPressed: () => Scaffold.of(context).openDrawer(),
+        ),
+      ),
       title: Padding(
         padding: const EdgeInsets.only(bottom: 10),
         child: Image.asset('assets/img/sana_logo_background.png', height: 80),
