@@ -49,5 +49,7 @@
 		<true/>
 		<key>UIViewControllerBasedStatusBarAppearance</key>
 		<false/>
+		<key>NSFaceIDUsageDescription</key>
+		<string>Esta aplicación requiere acceso a Face ID para una autenticación segura y rápida.</string>
 	</dict>
 </plist>
