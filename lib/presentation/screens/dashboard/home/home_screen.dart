@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class Dashboard extends StatelessWidget {
+class HomeScreen extends StatelessWidget {
   static const String routePath = '/';
-  static const String routeName = 'dashboard';
+  static const String routeName = 'home';
 
-  const Dashboard({super.key});
+  const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

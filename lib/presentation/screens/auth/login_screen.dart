@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:sana/core/config/theme/app_theme.dart';
-import 'package:sana/presentation/screens/dashboard/dashboard_screen.dart';
+import 'package:sana/presentation/screens/dashboard/home/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
@@ -78,7 +78,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _onLoginSuccess() {
     if (mounted) {
-      context.go(Dashboard.routePath);
+      context.go(HomeScreen.routePath);
     }
   }
 
