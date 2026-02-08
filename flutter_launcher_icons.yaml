@@ -1,0 +1,43 @@
+# Configuración de iconos de la aplicación
+# Ejecutar: flutter pub run flutter_launcher_icons
+
+flutter_launcher_icons:
+  # Ruta principal del icono (se usa si no hay rutas específicas por plataforma)
+  image_path: "assets/img/flutter_launcher_icons/sana_logo_background.png"
+
+  # Configuración para Android
+  android: "launcher_icon"
+  image_path_android: "assets/img/flutter_launcher_icons/sana_logo_background.png"
+  min_sdk_android: 21
+
+  # Iconos adaptativos para Android (opcional)
+  # adaptive_icon_background: "assets/img/flutter_launcher_icons/background.png"
+  # adaptive_icon_foreground: "assets/img/flutter_launcher_icons/foreground.png"
+  # adaptive_icon_monochrome: "assets/img/flutter_launcher_icons/monochrome.png"
+
+  # Configuración para iOS
+  ios: true
+  image_path_ios: "assets/img/flutter_launcher_icons/sana_logo_background.png"
+  remove_alpha_ios: true
+
+  # Iconos adicionales para iOS (opcional)
+  # image_path_ios_dark_transparent: "assets/img/flutter_launcher_icons/icon_dark.png"
+  # image_path_ios_tinted_grayscale: "assets/img/flutter_launcher_icons/icon_tinted.png"
+
+  # Web (opcional)
+  # web:
+  #   generate: true
+  #   image_path: "assets/img/flutter_launcher_icons/icon.png"
+  #   background_color: "#122640"
+  #   theme_color: "#1E82D9"
+
+  # Windows (opcional)
+  # windows:
+  #   generate: true
+  #   image_path: "assets/img/flutter_launcher_icons/icon.png"
+  #   icon_size: 256
+
+  # macOS (opcional)
+  # macos:
+  #   generate: true
+  #   image_path: "assets/img/flutter_launcher_icons/icon.png"
