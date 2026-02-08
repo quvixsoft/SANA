@@ -20,7 +20,7 @@ class HomeScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: const [
                   Text(
-                    'Hola, Carlos',
+                    'Hola, Armando',
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w900,

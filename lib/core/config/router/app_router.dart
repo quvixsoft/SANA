@@ -1,7 +1,9 @@
 import 'package:go_router/go_router.dart';
 import 'package:sana/presentation/layouts/app_layout.dart';
 import 'package:sana/presentation/layouts/auth_layout.dart';
+import 'package:sana/presentation/screens/auth/forgot_password_screen.dart';
 import 'package:sana/presentation/screens/auth/login_screen.dart';
+import 'package:sana/presentation/screens/auth/register_screen.dart';
 import 'package:sana/presentation/screens/dashboard/home/home_screen.dart';
 import 'package:sana/presentation/screens/dashboard/history/history_screen.dart';
 import 'package:sana/presentation/screens/dashboard/labs/labs_screen.dart';
@@ -31,6 +33,16 @@ final appRouter = GoRouter(
               path: LoginScreen.routePath,
               name: LoginScreen.routeName,
               builder: (context, state) => const LoginScreen(),
+            ),
+            GoRoute(
+              path: ForgotPasswordScreen.routePath,
+              name: ForgotPasswordScreen.routeName,
+              builder: (context, state) => const ForgotPasswordScreen(),
+            ),
+            GoRoute(
+              path: RegisterScreen.routePath,
+              name: RegisterScreen.routeName,
+              builder: (context, state) => const RegisterScreen(),
             ),
           ],
         ),
