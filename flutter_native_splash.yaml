@@ -1,0 +1,16 @@
+flutter_native_splash:
+  color: "#122640" # Color de fondo del splash screen
+  image: assets/img/flutter_native_splash/android_logo.png # Imagen del splash
+  #branding: assets/img/flutter_native_splash/branding.png
+  android: true # Activar en Android
+  ios: true # Activar en iOS
+  web: false
+  #background_image: assets/img/flutter_native_splash/background_image_splash.png # Fondo del splash
+  fullscreen: true # Pantalla completa sin barra de estado
+  android_gravity: center # Centrar imagen en Android
+  ios_content_mode: center # Centrar imagen en iOS
+
+  android_12:
+    image: assets/img/flutter_native_splash/android_logo.png
+    color: "#122640"
+    #branding: assets/img/flutter_native_splash/android_branding.png

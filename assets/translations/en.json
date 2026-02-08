@@ -1,0 +1,42 @@
+{
+  "app": {
+    "name": "S A N A",
+    "subtitle": "System for Assisted Needs Analysis"
+  },
+  "onboarding": {
+    "skip": "Skip",
+    "next": "Next",
+    "step1": {
+      "title": "Welcome to SANA",
+      "description": "Your Health Assistant, fast, accurate, and personalized diagnostics."
+    },
+    "step2": {
+      "title": "Describe Your Symptoms",
+      "description": "Chat with our AI. Answer simple questions for a preliminary analysis."
+    },
+    "step3": {
+      "title": "Get Recommendations",
+      "description": "Receive guidance and advice. It does not replace a doctor, but provides valuable information."
+    }
+  },
+  "login": {
+    "title": "Sign In",
+    "email": "Email Address",
+    "email_placeholder": "name@example.com",
+    "password": "Password",
+    "password_placeholder": "••••••••",
+    "forgot_password": "Forgot your password?",
+    "login_button": "SIGN IN",
+    "or_continue_with": "OR CONTINUE WITH",
+    "google_login": "Continue with Google",
+    "no_account": "Don't have an account? ",
+    "create_account": "Create account",
+    "biometric_prompt": "Please authenticate to access Sana",
+    "biometric_tooltip": "Use Fingerprint",
+    "enable_biometric_title": "Enable Fingerprint",
+    "enable_biometric_message": "Do you want to use your fingerprint to sign in next time?",
+    "yes_enable": "Yes, enable",
+    "no": "No",
+    "login_success": "Login successful"
+  }
+}
