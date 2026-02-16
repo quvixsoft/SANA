@@ -1,29 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:sana/core/config/theme/app_theme.dart';
 import 'package:sana/presentation/widgets/buttons/primary_button.dart';
 import 'package:sana/presentation/screens/dashboard/home/home_screen.dart';
+import 'package:sana/presentation/providers/auth_provider.dart';
+import 'package:sana/presentation/providers/auth_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sana/presentation/screens/auth/forgot_password_screen.dart';
 import 'package:sana/presentation/screens/auth/register_screen.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   static const String routePath = '/auth/login';
   static const String routeName = 'login';
 
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends ConsumerState<LoginScreen> {
   final LocalAuthentication auth = LocalAuthentication();
   bool _canCheckBiometrics = false;
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -53,7 +58,6 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _attemptAutoLogin() async {
-    // Wait for biometric check to complete
     await Future.delayed(const Duration(milliseconds: 500));
 
     final prefs = await SharedPreferences.getInstance();
@@ -74,7 +78,6 @@ class _LoginScreenState extends State<LoginScreen> {
         _onLoginSuccess();
       }
     } catch (e) {
-      // Handle error or cancel
       debugPrint("Auth error: $e");
     }
   }
@@ -85,312 +88,282 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
+  /// Validación de email
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'login.email_required'.tr();
+    }
+    // Regex para validar formato de email
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value)) {
+      return 'login.email_invalid'.tr();
+    }
+    return null;
+  }
+
+  /// Validación de password
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'login.password_required'.tr();
+    }
+    if (value.length < 8) {
+      return 'login.password_min_length'.tr();
+    }
+    return null;
+  }
+
   Future<void> _handleLogin() async {
-    // Simulate validation
-    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor llena todos los campos')),
-      );
+    // Validar formulario
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
-    // Simulate Login Success
-    final prefs = await SharedPreferences.getInstance();
-    final bool useBiometrics = prefs.getBool('use_biometrics') ?? false;
+    setState(() => _isLoading = true);
 
-    if (!useBiometrics && _canCheckBiometrics) {
-      // Ask to enable biometrics
-      if (!mounted) return;
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('login.enable_biometric_title'.tr()),
-          content: Text('login.enable_biometric_message'.tr()),
-          actions: [
-            TextButton(
-              onPressed: () {
+    try {
+      // Llamar al provider para hacer login
+      await ref
+          .read(authNotifierProvider.notifier)
+          .login(_emailController.text.trim(), _passwordController.text);
+
+      // Escuchar el estado para manejar éxito/error
+      final authState = ref.read(authNotifierProvider);
+
+      if (authState is AuthStateAuthenticated) {
+        // Login exitoso
+        if (!mounted) return;
+
+        final prefs = await SharedPreferences.getInstance();
+        final bool useBiometrics = prefs.getBool('use_biometrics') ?? false;
+
+        if (!useBiometrics && _canCheckBiometrics) {
+          // Preguntar si quiere habilitar biometría
+          _showBiometricDialog(prefs);
+        } else {
+          _onLoginSuccess();
+        }
+      } else if (authState is AuthStateError) {
+        // Mostrar error
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(authState.message),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
+  }
+
+  void _showBiometricDialog(SharedPreferences prefs) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('login.enable_biometric_title'.tr()),
+        content: Text('login.enable_biometric_message'.tr()),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _onLoginSuccess();
+            },
+            child: Text('login.no'.tr()),
+          ),
+          TextButton(
+            onPressed: () async {
+              await prefs.setBool('use_biometrics', true);
+              if (context.mounted) {
                 Navigator.pop(context);
                 _onLoginSuccess();
-              },
-              child: Text('login.no'.tr()),
-            ),
-            TextButton(
-              onPressed: () async {
-                await prefs.setBool('use_biometrics', true);
-                if (context.mounted) {
-                  Navigator.pop(context);
-                  _onLoginSuccess();
-                }
-              },
-              child: Text('login.yes_enable'.tr()),
-            ),
-          ],
-        ),
-      );
-    } else {
-      _onLoginSuccess();
-    }
+              }
+            },
+            child: Text('login.yes_enable'.tr()),
+          ),
+        ],
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
+    // Escuchar cambios en el estado de autenticación
+    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
+      if (next is AuthStateError) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(next.message), backgroundColor: Colors.red),
+        );
+      }
+    });
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(32.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // Logo
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [AppColors.primary, AppColors.darkNavy],
-                    ),
-                    borderRadius: BorderRadius.circular(30),
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppColors.primary.withOpacity(0.2),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  transform: Matrix4.rotationZ(0.05), // ~3 degrees
-                  child: const Center(
-                    child: Icon(
-                      Icons.psychology,
-                      color: Colors.white,
-                      size: 60,
-                    ),
-                  ),
-                ),
-                Text(
-                  'app.name'.tr(),
-                  style: const TextStyle(
-                    fontSize: 36,
-                    fontWeight: FontWeight.w900,
-                    color: AppColors.darkNavy,
-                    letterSpacing: -1,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Text(
-                    'app.subtitle'.tr(),
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.grey,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(height: 48),
-
-                // Form
-                Column(
-                  children: [
-                    _buildTextField(
-                      controller: _emailController,
-                      label: 'login.email'.tr(),
-                      placeholder: 'login.email_placeholder'.tr(),
-                      icon: Icons.email,
-                    ),
-                    const SizedBox(height: 16),
-                    _buildTextField(
-                      controller: _passwordController,
-                      label: 'login.password'.tr(),
-                      placeholder: 'login.password_placeholder'.tr(),
-                      icon: Icons.lock,
-                      isPassword: true,
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    Align(
-                      alignment: Alignment.centerRight,
-                      child: TextButton(
-                        onPressed: () =>
-                            context.push(ForgotPasswordScreen.routePath),
-                        child: Text(
-                          'login.forgot_password'.tr(),
-                          style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    PrimaryButton(
-                      text: 'login.login_button'.tr(),
-                      onPressed: _handleLogin,
-                      icon: Icons.arrow_forward,
-                      expand: true,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 32,
-                        vertical: 20,
-                      ),
-                    ),
-                  ],
-                ),
-
-                const SizedBox(height: 32),
-
-                // Divider
-                Row(
-                  children: [
-                    const Expanded(child: Divider()),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: Text(
-                        'login.or_continue_with'.tr(),
-                        style: TextStyle(
-                          fontSize: 10,
-                          fontWeight: FontWeight.w900,
-                          color: AppColors.grey.withOpacity(0.7),
-                        ),
-                      ),
-                    ),
-                    const Expanded(child: Divider()),
-                  ],
-                ),
-
-                const SizedBox(height: 32),
-
-                // Google Button
-                OutlinedButton(
-                  onPressed: _handleLogin,
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    side: BorderSide(color: AppColors.grey200),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.large),
-                    ),
-                    minimumSize: const Size(double.infinity, 50),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: const BoxDecoration(
-                          color: Colors.white,
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Text(
-                          "G",
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 18,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Text(
-                        'login.google_login'.tr(),
-                        style: const TextStyle(
-                          color: AppColors.darkNavy,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                if (_canCheckBiometrics) ...[
-                  const SizedBox(height: 16),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.fingerprint,
-                      size: 40,
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // Logo
+                  Container(
+                    width: 120,
+                    height: 120,
+                    decoration: BoxDecoration(
                       color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(60),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.3),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
+                        ),
+                      ],
                     ),
-                    onPressed: _authenticate,
-                    tooltip: 'login.biometric_tooltip'.tr(),
+                    child: const Icon(
+                      Icons.health_and_safety,
+                      size: 60,
+                      color: Colors.white,
+                    ),
                   ),
-                ],
+                  const SizedBox(height: 40),
 
-                const SizedBox(height: 32),
-
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'login.no_account'.tr(),
-                      style: TextStyle(color: AppColors.grey),
+                  // Título
+                  Text(
+                    'login.title'.tr(),
+                    style: const TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.darkNavy,
                     ),
-                    TextButton(
-                      onPressed: () => context.push(RegisterScreen.routePath),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'login.subtitle'.tr(),
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: AppColors.darkNavy.withOpacity(0.6),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+
+                  // Email Field
+                  TextFormField(
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: _validateEmail,
+                    decoration: InputDecoration(
+                      labelText: 'login.email'.tr(),
+                      hintText: 'login.email_hint'.tr(),
+                      prefixIcon: const Icon(Icons.email_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Password Field
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: true,
+                    validator: _validatePassword,
+                    decoration: InputDecoration(
+                      labelText: 'login.password'.tr(),
+                      hintText: 'login.password_hint'.tr(),
+                      prefixIcon: const Icon(Icons.lock_outline),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  // Forgot Password
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {
+                        context.push(ForgotPasswordScreen.routePath);
+                      },
                       child: Text(
-                        'login.create_account'.tr(),
-                        style: TextStyle(
-                          fontWeight: FontWeight.bold,
+                        'login.forgot_password'.tr(),
+                        style: const TextStyle(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Login Button
+                  PrimaryButton(
+                    text: 'login.button'.tr(),
+                    onPressed: _isLoading ? null : _handleLogin,
+                    expand: true,
+                    isLoading: _isLoading,
+                  ),
+                  const SizedBox(height: 24),
+
+                  // Biometric Login (if available)
+                  if (_canCheckBiometrics)
+                    Column(
+                      children: [
+                        Text(
+                          'login.or'.tr(),
+                          style: TextStyle(
+                            color: AppColors.darkNavy.withOpacity(0.6),
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        IconButton(
+                          onPressed: _authenticate,
+                          icon: const Icon(Icons.fingerprint),
+                          iconSize: 48,
                           color: AppColors.primary,
                         ),
-                      ),
+                        const SizedBox(height: 24),
+                      ],
                     ),
-                  ],
-                ),
-              ],
+
+                  // Register Link
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'login.no_account'.tr(),
+                        style: TextStyle(
+                          color: AppColors.darkNavy.withOpacity(0.6),
+                        ),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          context.push(RegisterScreen.routePath);
+                        },
+                        child: Text(
+                          'login.register'.tr(),
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String placeholder,
-    required IconData icon,
-    bool isPassword = false,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.large),
-        border: Border.all(color: AppColors.grey200),
-        boxShadow: AppShadows.subtle,
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: isPassword,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w900,
-            color: AppColors.grey,
-            letterSpacing: 1,
-          ),
-          hintText: placeholder,
-          hintStyle: const TextStyle(
-            fontWeight: FontWeight.w500,
-            color: AppColors.darkNavy,
-          ),
-          prefixIcon: Icon(icon, color: AppColors.grey300),
-          suffixIcon: isPassword
-              ? const Icon(Icons.visibility, color: AppColors.grey)
-              : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-          floatingLabelBehavior: FloatingLabelBehavior.always,
         ),
       ),
     );
