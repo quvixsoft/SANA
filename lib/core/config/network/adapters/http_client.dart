@@ -32,6 +32,9 @@ class HttpClient {
       BaseOptions(
         baseUrl: connection.url,
         headers: connection.header,
+        connectTimeout: const Duration(seconds: 10),
+        receiveTimeout: const Duration(seconds: 10),
+        sendTimeout: const Duration(seconds: 10),
         // validateStatus: (status) {
         //   return status == 409 || status == 308 || (status != null && status >= 200 && status < 300);
         // },

@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
 import 'package:sana/core/config/network/adapters/http_implementer.dart';
 import 'package:sana/domain/datasources/auth_datasources.dart';
 import 'package:sana/domain/entities/auth.dart';
@@ -6,19 +7,19 @@ import 'package:sana/infrastructure/mappers/auth_mapper.dart';
 import 'package:sana/infrastructure/models/auth_model.dart';
 
 class AuthApiSanaDatasource extends AuthDatasource {
-  final String baseUrl = 'api-sana';
+  final String connection = 'api-sana';
 
   @override
   Future<Login> login(String email, String password) async {
     try {
-      final response = await HttpImplementer.post(
-        baseUrl,
+      final response = await HttpImplementer.post<Map<String, dynamic>>(
+        connection,
         '/auth/login',
         data: {'email': email, 'password': password},
       );
-
+      debugPrint('response: API SANA $response');
       // Convertir respuesta JSON a modelo
-      final loginModel = LoginResponseModel.fromJson(response.data);
+      final loginModel = LoginResponseModel.fromJson(response.data!);
 
       // Convertir modelo a entidad usando el mapper
       return AuthMapper.loginResponseToEntity(loginModel);

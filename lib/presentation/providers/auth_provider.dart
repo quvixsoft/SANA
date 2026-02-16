@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:sana/core/services/secure_storage_service.dart';
 import 'package:sana/domain/datasources/auth_datasources.dart';
@@ -61,11 +62,12 @@ class AuthNotifier extends Notifier<AuthState> {
   /// Login con email y password
   Future<void> login(String email, String password) async {
     state = const AuthStateLoading();
-
+    debugPrint('email: $email');
+    debugPrint('password: $password');
     try {
       final repository = ref.read(authRepositoryProvider);
       final loginResponse = await repository.login(email, password);
-
+      debugPrint('loginResponse: $loginResponse');
       // Guardar tokens y datos del usuario
       final storage = ref.read(secureStorageProvider);
       await storage.saveAccessToken(loginResponse.accessToken);
