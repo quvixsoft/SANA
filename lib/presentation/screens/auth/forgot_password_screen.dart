@@ -1,6 +1,8 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sana/core/config/theme/app_theme.dart';
+import 'package:sana/presentation/widgets/buttons/primary_button.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   static const String routePath = '/auth/forgot-password';
@@ -24,15 +26,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   void _handleSendInstructions() {
     if (_emailController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor ingresa tu correo')),
+        SnackBar(content: Text('forgot-password.valid_email'.tr())),
       );
       return;
     }
 
     // Mock logic
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Instrucciones enviadas')));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('forgot-password.forgot-button-message'.tr())),
+    );
     context.pop();
   }
 
@@ -55,20 +57,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Recuperar Contraseña',
+                'forgot-password.title'.tr(),
                 style: AppTextStyles.h1.copyWith(color: AppColors.darkNavy),
               ),
               const SizedBox(height: 12),
               Text(
-                'Ingresa tu correo electrónico y te enviaremos las instrucciones para restablecer tu contraseña.',
+                'forgot-password.description'.tr(),
                 style: AppTextStyles.bodyLarge.copyWith(color: AppColors.grey),
               ),
               const SizedBox(height: 48),
 
               _buildTextField(
                 controller: _emailController,
-                label: 'Correo Electrónico',
-                placeholder: 'ejemplo@correo.com',
+                label: 'forgot-password.email'.tr(),
+                placeholder: 'forgot-password.email_placeholder'.tr(),
                 icon: Icons.email_outlined,
               ),
 
@@ -76,23 +78,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
               SizedBox(
                 width: double.infinity,
-                child: ElevatedButton(
+                child: PrimaryButton(
+                  text: 'forgot-password.title'.tr(),
                   onPressed: _handleSendInstructions,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.large),
-                    ),
-                    elevation: 4,
-                  ),
-                  child: const Text(
-                    'ENVIAR INSTRUCCIONES',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
-                    ),
+                  icon: Icons.arrow_forward,
+                  expand: true,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 20,
                   ),
                 ),
               ),

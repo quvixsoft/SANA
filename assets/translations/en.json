@@ -38,5 +38,34 @@
     "yes_enable": "Yes, enable",
     "no": "No",
     "login_success": "Login successful"
+  },
+
+  "forgot-password": {
+    "title": "Recover Password",
+    "email": "Email Address",
+    "valid_email": "Please enter your email",
+    "email_placeholder": "name@example.com",
+    "send_reset_link": "Send Reset Link",
+    "back_to_login": "Back to Login",
+    "forgot-button": "Send Instructions",
+    "description": "Enter your email address and we'll send you instructions to reset your password.",
+    "forgot-button-message": "Instructions sent successfully"
+  },
+
+  "register": {
+    "title": "Create Account",
+    "subtitle": "Create an account to start managing your health.",
+    "full_name": "Full Name",
+    "name_placeholder": "John Doe",
+    "email": "Email Address",
+    "email_placeholder": "name@example.com",
+    "password": "Password",
+    "confirm_password": "Confirm Password",
+    "password_placeholder": "••••••••",
+    "register_button": "SIGN UP",
+    "already_have_account": "Already have an account?",
+    "login_link": "Sign In",
+    "error_empty_fields": "Please complete all fields",
+    "error_password_match": "Passwords do not match"
   }
 }

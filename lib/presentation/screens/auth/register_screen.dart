@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sana/core/config/theme/app_theme.dart';
 import 'package:sana/presentation/screens/dashboard/home/home_screen.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:sana/presentation/widgets/buttons/primary_button.dart';
 
 class RegisterScreen extends StatefulWidget {
   static const String routePath = '/auth/register';
@@ -34,14 +36,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor completa todos los campos')),
+        SnackBar(content: Text('register.error_empty_fields'.tr())),
       );
       return;
     }
 
     if (_passwordController.text != _confirmPasswordController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Las contraseñas no coinciden')),
+        SnackBar(content: Text('register.error_password_match'.tr())),
       );
       return;
     }
@@ -69,69 +71,53 @@ class _RegisterScreenState extends State<RegisterScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Crear Cuenta',
+                'register.title'.tr(),
                 style: AppTextStyles.h1.copyWith(color: AppColors.darkNavy),
               ),
               const SizedBox(height: 12),
               Text(
-                'Crea una cuenta para comenzar a gestionar tu salud.',
+                'register.subtitle'.tr(),
                 style: AppTextStyles.bodyLarge.copyWith(color: AppColors.grey),
               ),
               const SizedBox(height: 32),
 
               _buildTextField(
                 controller: _nameController,
-                label: 'Nombre Completo',
-                placeholder: 'Juan Pérez',
+                label: 'register.full_name'.tr(),
+                placeholder: 'register.name_placeholder'.tr(),
                 icon: Icons.person_outline,
               ),
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _emailController,
-                label: 'Correo Electrónico',
-                placeholder: 'ejemplo@correo.com',
+                label: 'register.email'.tr(),
+                placeholder: 'register.email_placeholder'.tr(),
                 icon: Icons.email_outlined,
               ),
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _passwordController,
-                label: 'Contraseña',
-                placeholder: '********',
+                label: 'register.password'.tr(),
+                placeholder: 'register.password_placeholder'.tr(),
                 icon: Icons.lock_outline,
                 isPassword: true,
               ),
               const SizedBox(height: 16),
               _buildTextField(
                 controller: _confirmPasswordController,
-                label: 'Confirmar Contraseña',
-                placeholder: '********',
+                label: 'register.confirm_password'.tr(),
+                placeholder: 'register.password_placeholder'.tr(),
                 icon: Icons.lock_outline,
                 isPassword: true,
               ),
 
               const SizedBox(height: 32),
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: _handleRegister,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 20),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.large),
-                    ),
-                    elevation: 4,
-                  ),
-                  child: const Text(
-                    'REGISTRARSE',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1,
-                    ),
-                  ),
-                ),
+              PrimaryButton(
+                text: 'register.register_button'.tr(),
+                onPressed: _handleRegister,
+                expand: true,
+                padding: const EdgeInsets.symmetric(vertical: 20),
               ),
 
               const SizedBox(height: 24),
@@ -139,15 +125,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text(
-                    '¿Ya tienes una cuenta?',
-                    style: TextStyle(color: AppColors.grey),
+                  Text(
+                    'register.already_have_account'.tr(),
+                    style: const TextStyle(color: AppColors.grey),
                   ),
                   TextButton(
                     onPressed: () => context.pop(),
-                    child: const Text(
-                      'Iniciar Sesión',
-                      style: TextStyle(
+                    child: Text(
+                      'register.login_link'.tr(),
+                      style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         color: AppColors.primary,
                       ),

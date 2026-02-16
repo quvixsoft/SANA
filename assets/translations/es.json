@@ -39,5 +39,34 @@
     "yes_enable": "Sí, activar",
     "no": "No",
     "login_success": "Login exitoso"
+  },
+
+  "forgot-password": {
+    "title": "Recuperar Contraseña",
+    "email": "Correo Electrónico",
+    "valid_email": "Por favor ingresa tu correo",
+    "email_placeholder": "nombre@ejemplo.com",
+    "send_reset_link": "Enviar Enlace de Restablecimiento",
+    "back_to_login": "Volver al Inicio de Sesión",
+    "forgot-button": "Enviar Instrucciones",
+    "description": "Ingresa tu correo electrónico y te enviaremos las instrucciones para restablecer tu contraseña.",
+    "forgot-button-message": "Instrucciones enviadas exitosamente"
+  },
+
+  "register": {
+    "title": "Crear Cuenta",
+    "subtitle": "Crea una cuenta para comenzar a gestionar tu salud.",
+    "full_name": "Nombre Completo",
+    "name_placeholder": "Juan Pérez",
+    "email": "Correo Electrónico",
+    "email_placeholder": "ejemplo@correo.com",
+    "password": "Contraseña",
+    "confirm_password": "Confirmar Contraseña",
+    "password_placeholder": "••••••••",
+    "register_button": "REGISTRARSE",
+    "already_have_account": "¿Ya tienes una cuenta? ",
+    "login_link": "Iniciar Sesión",
+    "error_empty_fields": "Por favor completa todos los campos",
+    "error_password_match": "Las contraseñas no coinciden"
   }
 }
