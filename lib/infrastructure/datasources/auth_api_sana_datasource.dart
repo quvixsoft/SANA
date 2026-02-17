@@ -53,4 +53,59 @@ class AuthApiSanaDatasource extends AuthDatasource {
       throw Exception('Error inesperado: $e');
     }
   }
+
+  @override
+  Future<User> register(
+    String email,
+    String password,
+    String name,
+    String birthDate,
+    bool disclaimerAccepted,
+    int roleId,
+  ) async {
+    try {
+      final response = await HttpImplementer.post<Map<String, dynamic>>(
+        connection,
+        '/users',
+        data: {
+          'email': email,
+          'password': password,
+          'name': name,
+          'birthDate': birthDate,
+          'disclaimerAccepted': disclaimerAccepted,
+          'roleId': roleId,
+        },
+      );
+      debugPrint('response: API SANA REGISTER $response');
+      // Convertir respuesta JSON a modelo de usuario
+      final userModel = UserModel.fromJson(response.data!);
+
+      // Convertir modelo a entidad usando el mapper
+      return AuthMapper.userModelToEntity(userModel);
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final statusCode = e.response!.statusCode;
+        final message = e.response!.data['message'] ?? 'Error desconocido';
+
+        if (statusCode == 400 && message is List) {
+          throw Exception(message.join(', '));
+        }
+
+        switch (statusCode) {
+          case 400:
+            throw Exception('Datos inválidos: $message');
+          case 409:
+            throw Exception('El usuario ya existe');
+          case 500:
+            throw Exception('Error del servidor');
+          default:
+            throw Exception('Error HTTP $statusCode: $message');
+        }
+      } else {
+        throw Exception('Error de conexión: ${e.message}');
+      }
+    } catch (e) {
+      throw Exception('Error inesperado: $e');
+    }
+  }
 }

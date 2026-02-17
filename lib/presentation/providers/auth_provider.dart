@@ -91,6 +91,35 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  /// Registro de usuario
+  Future<void> register({
+    required String email,
+    required String password,
+    required String name,
+    required String birthDate,
+    required bool disclaimerAccepted,
+    required int roleId,
+  }) async {
+    state = const AuthStateLoading();
+    try {
+      final repository = ref.read(authRepositoryProvider);
+      await repository.register(
+        email,
+        password,
+        name,
+        birthDate,
+        disclaimerAccepted,
+        roleId,
+      );
+      // Tras registro exitoso, no autenticamos automáticamente según requerimiento.
+      // El estado vuelve a Unauthenticated para que el usuario haga login.
+      // Opcionalmente podríamos hacer login automático aquí si se desea.
+      state = const AuthStateUnauthenticated();
+    } catch (e) {
+      state = AuthStateError(e.toString().replaceAll('Exception: ', ''));
+    }
+  }
+
   /// Logout - eliminar sesión
   Future<void> logout() async {
     state = const AuthStateLoading();

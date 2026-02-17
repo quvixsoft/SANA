@@ -1,26 +1,30 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sana/core/config/theme/app_theme.dart';
-import 'package:sana/presentation/screens/dashboard/home/home_screen.dart';
-import 'package:easy_localization/easy_localization.dart';
+import 'package:sana/presentation/providers/auth_provider.dart';
+import 'package:sana/presentation/providers/auth_state.dart';
 import 'package:sana/presentation/widgets/buttons/primary_button.dart';
 
-class RegisterScreen extends StatefulWidget {
+class RegisterScreen extends ConsumerStatefulWidget {
   static const String routePath = '/auth/register';
   static const String routeName = 'register';
 
   const RegisterScreen({super.key});
 
   @override
-  State<RegisterScreen> createState() => _RegisterScreenState();
+  ConsumerState<RegisterScreen> createState() => _RegisterScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _RegisterScreenState extends ConsumerState<RegisterScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  bool _isPasswordVisible = false;
+  bool _isConfirmPasswordVisible = false;
 
   @override
   void dispose() {
@@ -31,7 +35,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _handleRegister() {
+  Future<void> _handleRegister() async {
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty) {
@@ -48,12 +52,51 @@ class _RegisterScreenState extends State<RegisterScreen> {
       return;
     }
 
-    // Mock logic
-    context.go(HomeScreen.routePath);
+    // Llamada al provider para registrar
+    await ref
+        .read(authNotifierProvider.notifier)
+        .register(
+          email: _emailController.text.trim(),
+          password: _passwordController.text.trim(),
+          name: _nameController.text.trim(),
+          birthDate: DateTime.now()
+              .toIso8601String(), // Por defecto hoy, ajustar si hay campo fecha
+          disclaimerAccepted: true, // Asumimos true por ahora
+          roleId: 2, // 2 = Patient/User por defecto (ajustar según backend)
+        );
+
+    // Verificar el estado después de intentar registrar
+    final authState = ref.read(authNotifierProvider);
+
+    if (authState is AuthStateError) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(authState.message),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } else if (authState is AuthStateUnauthenticated) {
+      // Éxito: estado vuelve a unauthenticated (sin error)
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Registro exitoso. Por favor inicia sesión.'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        // Ir al login
+        context.pop();
+      }
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final authState = ref.watch(authNotifierProvider);
+    final isLoading = authState is AuthStateLoading;
+
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),
       appBar: AppBar(
@@ -101,6 +144,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 placeholder: 'register.password_placeholder'.tr(),
                 icon: Icons.lock_outline,
                 isPassword: true,
+                isVisible: _isPasswordVisible,
+                onVisibilityChanged: () {
+                  setState(() {
+                    _isPasswordVisible = !_isPasswordVisible;
+                  });
+                },
               ),
               const SizedBox(height: 16),
               _buildTextField(
@@ -109,6 +158,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 placeholder: 'register.password_placeholder'.tr(),
                 icon: Icons.lock_outline,
                 isPassword: true,
+                isVisible: _isConfirmPasswordVisible,
+                onVisibilityChanged: () {
+                  setState(() {
+                    _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                  });
+                },
               ),
 
               const SizedBox(height: 32),
@@ -154,6 +209,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
     required String placeholder,
     required IconData icon,
     bool isPassword = false,
+    bool isVisible = false,
+    VoidCallback? onVisibilityChanged,
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -164,7 +221,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       ),
       child: TextField(
         controller: controller,
-        obscureText: isPassword,
+        obscureText: isPassword && !isVisible,
         decoration: InputDecoration(
           labelText: label,
           labelStyle: const TextStyle(
@@ -180,7 +237,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
           ),
           prefixIcon: Icon(icon, color: AppColors.grey300),
           suffixIcon: isPassword
-              ? const Icon(Icons.visibility, color: AppColors.grey)
+              ? IconButton(
+                  icon: Icon(
+                    isVisible ? Icons.visibility : Icons.visibility_off,
+                    color: AppColors.grey,
+                  ),
+                  onPressed: onVisibilityChanged,
+                )
               : null,
           border: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(
