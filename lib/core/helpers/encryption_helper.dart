@@ -9,7 +9,7 @@ class EncryptionHelper {
   static void initialize({required String encryptionKey}) {
     final key = encrypt_lib.Key.fromUtf8(encryptionKey);
     _encrypter = encrypt_lib.Encrypter(encrypt_lib.AES(key));
-    _iv = encrypt_lib.IV.fromLength(16);
+    _iv = encrypt_lib.IV.fromUtf8(encryptionKey.substring(0, 16));
   }
 
   static String encrypt(String plainText) {
@@ -47,7 +47,9 @@ class EncryptionHelper {
   static Future<String?> readEncrypted(String key) async {
     try {
       final encryptedValue = await _storage.read(key: key);
-      return encryptedValue?.isNotEmpty == true ? decrypt(encryptedValue!) : null;
+      return encryptedValue?.isNotEmpty == true
+          ? decrypt(encryptedValue!)
+          : null;
     } catch (e) {
       print('Error al leer datos encriptados: $e');
       return null;

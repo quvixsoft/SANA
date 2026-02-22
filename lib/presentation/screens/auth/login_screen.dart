@@ -140,6 +140,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         try {
           final user = await EncryptionHelper.readEncrypted('username') ?? '';
           final pass = await EncryptionHelper.readEncrypted('password') ?? '';
+
+          debugPrint('user: $user');
+          debugPrint('pass: $pass');
           await ref.read(authNotifierProvider.notifier).login(user, pass);
           // Escuchar el estado para manejar éxito/error
           final authState = ref.read(authNotifierProvider);
