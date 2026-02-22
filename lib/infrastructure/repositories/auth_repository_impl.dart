@@ -17,4 +17,27 @@ class AuthRepositoryImpl implements AuthRepository {
       rethrow;
     }
   }
+
+  @override
+  Future<User> register(
+    String email,
+    String password,
+    String name,
+    String birthDate,
+    bool disclaimerAccepted,
+    int roleId,
+  ) async {
+    try {
+      return await datasource.register(
+        email,
+        password,
+        name,
+        birthDate,
+        disclaimerAccepted,
+        roleId,
+      );
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

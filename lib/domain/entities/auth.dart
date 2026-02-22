@@ -1,3 +1,6 @@
+/**
+ * Paso numero 1. Crear la identidad, el modelo de datos que se va a utilizar en el modulo.
+ */
 class Login {
   String accessToken;
   String refreshToken;
