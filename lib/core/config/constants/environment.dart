@@ -7,4 +7,6 @@ class Environment {
   static get debug => dotenv.env['APP_DEBUG'] == 'true';
   static get apiSana =>
       dotenv.env['API_SANA'] ?? 'http://192.168.0.103:3000/v1/';
+  static get encryptionKey =>
+      dotenv.env['ENCRYPTION_KEY'] ?? 'SanaApp2024SecureKey32CharsLong!';
 }

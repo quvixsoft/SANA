@@ -4,6 +4,7 @@ import 'package:sana/presentation/layouts/auth_layout.dart';
 import 'package:sana/presentation/screens/auth/forgot_password_screen.dart';
 import 'package:sana/presentation/screens/auth/login_screen.dart';
 import 'package:sana/presentation/screens/auth/register_screen.dart';
+import 'package:sana/presentation/screens/dashboard/chat/chat.dart';
 import 'package:sana/presentation/screens/dashboard/home/home_screen.dart';
 import 'package:sana/presentation/screens/dashboard/history/history_screen.dart';
 import 'package:sana/presentation/screens/dashboard/labs/labs_screen.dart';
@@ -79,10 +80,9 @@ final appRouter = GoRouter(
         StatefulShellBranch(
           routes: <RouteBase>[
             GoRoute(
-              path: '/chat',
-              name: 'chat',
-              builder: (context, state) =>
-                  const HomeScreen(), // Placeholder for chat if needed, OR keep as is
+              path: Chat.routePath,
+              name: Chat.routeName,
+              builder: (context, state) => const Chat(),
             ),
           ],
         ),

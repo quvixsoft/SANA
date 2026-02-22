@@ -15,6 +15,7 @@ class AppColors {
   static const Color error = Color(0xFFD91E1E);
   static const Color warning = Color(0xFFFF9800);
   static const Color info = Color(0xFF9C27B0);
+  static const Color infowarning = Colors.orange;
 
   // Greys
   static const Color grey50 = Color(0xFFF1F5F9);

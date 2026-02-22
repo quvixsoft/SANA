@@ -8,15 +8,15 @@
     "next": "Next",
     "step1": {
       "title": "Welcome to SANA",
-      "description": "Your Health Assistant, fast, accurate, and personalized diagnostics."
+      "description": "We find the real cause of your symptoms"
     },
     "step2": {
-      "title": "Describe Your Symptoms",
-      "description": "Chat with our AI. Answer simple questions for a preliminary analysis."
+      "title": "Our Method",
+      "description": "We cross-reference your words with the evidence from your labs."
     },
     "step3": {
-      "title": "Get Recommendations",
-      "description": "Receive guidance and advice. It does not replace a doctor, but provides valuable information."
+      "title": "What You Should Know Before Starting",
+      "description": "SANA is a data analysis tool. This report does not replace the professional opinion of a healthcare provider."
     }
   },
   "login": {
@@ -47,7 +47,19 @@
     "enable_biometric_message": "Do you want to use your fingerprint to sign in next time?",
     "yes_enable": "Yes, enable",
     "no": "No",
-    "login_success": "Login successful"
+    "login_success": "Login successful",
+    "remember_me": "Remember me",
+    "biometric_device_not_supported": "Your device does not support biometric authentication",
+    "biometric_activate_reason": "Authenticate to enable fingerprint sign-in",
+    "biometric_scan_reason": "Scan your fingerprint to authenticate",
+    "biometric_modal_title": "Biometric Authentication",
+    "biometric_about_title": "About Biometric Authentication",
+    "biometric_about_content": "Biometric authentication is an alternative that allows you to sign in quickly and securely, using (depending on your mobile device) your fingerprint as an access method.",
+    "biometric_status_disabled": "Disabled: Indicates that the biometric authentication option has not been activated.",
+    "biometric_status_pending": "Waiting for credentials: Indicates that biometric authentication has been activated.\n\nTo complete the activation process, you must sign in with your credentials and then scan your fingerprint.",
+    "biometric_status_active": "Active: Biometric authentication is active and ready to use. Press the fingerprint button that will be enabled to sign in.",
+    "biometric_use_toggle": "Use Biometric Authentication",
+    "biometric_accept": "Accept"
   },
 
   "forgot-password": {

@@ -24,20 +24,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     {
       "title": "onboarding.step1.title".tr(),
       "description": "onboarding.step1.description".tr(),
-      "icon": Icons.security_outlined,
+      "icon": Icons.volunteer_activism,
       "color": AppColors.primary,
     },
     {
       "title": "onboarding.step2.title".tr(),
       "description": "onboarding.step2.description".tr(),
-      "icon": Icons.psychology_outlined,
-      "color": AppColors.primary,
+      "icon": Icons.account_tree_outlined,
+      "color": AppColors.successGreen,
     },
     {
       "title": "onboarding.step3.title".tr(),
       "description": "onboarding.step3.description".tr(),
-      "icon": Icons.assignment_outlined,
-      "color": AppColors.successGreen,
+      "icon": Icons.shield,
+      "color": AppColors.infowarning,
     },
   ];
 
@@ -100,38 +100,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Row(
-                            children: [
-                              Container(
-                                width: 32,
-                                height: 32,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(
-                                    AppRadius.small,
-                                  ),
-                                  border: Border.all(
-                                    color: Colors.white.withValues(alpha: 0.2),
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.medical_services,
-                                  color: Colors.white,
-                                  size: 18,
-                                ),
-                              ),
-                              const SizedBox(width: 8),
-                              const Text(
-                                'Sana',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
-                                  letterSpacing: -0.5,
-                                ),
-                              ),
-                            ],
-                          ),
                           // Language Selector
                           const LanguageSelector(),
                         ],
@@ -154,11 +122,22 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 color: Colors.white.withValues(alpha: 0.1),
                               ),
                             ),
-                            child: Center(
-                              child: Icon(
-                                _steps[_currentStep]['icon'],
-                                size: 60,
-                                color: _steps[_currentStep]["color"],
+                            child: Container(
+                              padding: EdgeInsets.all(
+                                20,
+                              ), // Espacio alrededor del icono
+                              decoration: BoxDecoration(
+                                color: Colors.orange.withOpacity(
+                                  0.1,
+                                ), // Fondo naranja suave
+                                shape: BoxShape.circle, // Forma circular
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  _steps[_currentStep]['icon'],
+                                  size: 60,
+                                  color: _steps[_currentStep]["color"],
+                                ),
                               ),
                             ),
                           ),
