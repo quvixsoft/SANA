@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sana/core/config/theme/app_theme.dart';
+import 'package:sana/presentation/widgets/buttons/primary_button.dart';
 import 'package:sana/presentation/screens/auth/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
@@ -262,34 +263,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 ),
                               ),
                             ),
-                            ElevatedButton(
+                            PrimaryButton(
+                              text: 'onboarding.next'.tr(),
                               onPressed: _handleNext,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 32,
-                                  vertical: 16,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(
-                                    AppRadius.large,
-                                  ),
-                                ),
-                                elevation: 4,
-                              ),
-                              child: Row(
-                                children: [
-                                  Text(
-                                    'onboarding.next'.tr(),
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Icon(Icons.arrow_forward, size: 20),
-                                ],
-                              ),
+                              icon: Icons.arrow_forward,
                             ),
                           ],
                         ),

@@ -2,8 +2,6 @@ import 'package:sana/data/models/consultation.dart';
 import 'package:sana/data/models/lab_result.dart';
 import 'package:sana/data/models/user_profile.dart';
 
-import '../models/models.dart';
-
 class DataManager {
   static final DataManager _instance = DataManager._internal();
 

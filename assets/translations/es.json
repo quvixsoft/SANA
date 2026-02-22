@@ -22,15 +22,25 @@
 
   "login": {
     "title": "Iniciar Sesión",
+    "subtitle": "¡Bienvenido de nuevo! Inicia sesión para continuar.",
     "email": "Correo Electrónico",
+    "email_hint": "nombre@ejemplo.com",
     "email_placeholder": "nombre@ejemplo.com",
+    "email_required": "El correo es requerido",
+    "email_invalid": "Por favor ingresa un correo válido",
     "password": "Contraseña",
+    "password_hint": "Ingresa tu contraseña",
     "password_placeholder": "••••••••",
+    "password_required": "La contraseña es requerida",
+    "password_min_length": "La contraseña debe tener al menos 8 caracteres",
     "forgot_password": "¿Olvidaste tu contraseña?",
+    "button": "INICIAR SESIÓN",
     "login_button": "INICIAR SESIÓN",
+    "or": "O",
     "or_continue_with": "O CONTINÚA CON",
     "google_login": "Continuar con Google",
     "no_account": "¿No tienes cuenta? ",
+    "register": "Registrarse",
     "create_account": "Crear cuenta",
     "biometric_prompt": "Por favor autentícate para ingresar a Sana",
     "biometric_tooltip": "Usar Huella Digital",
@@ -39,5 +49,34 @@
     "yes_enable": "Sí, activar",
     "no": "No",
     "login_success": "Login exitoso"
+  },
+
+  "forgot-password": {
+    "title": "Recuperar Contraseña",
+    "email": "Correo Electrónico",
+    "valid_email": "Por favor ingresa tu correo",
+    "email_placeholder": "nombre@ejemplo.com",
+    "send_reset_link": "Enviar Enlace de Restablecimiento",
+    "back_to_login": "Volver al Inicio de Sesión",
+    "forgot-button": "Enviar Instrucciones",
+    "description": "Ingresa tu correo electrónico y te enviaremos las instrucciones para restablecer tu contraseña.",
+    "forgot-button-message": "Instrucciones enviadas exitosamente"
+  },
+
+  "register": {
+    "title": "Crear Cuenta",
+    "subtitle": "Crea una cuenta para comenzar a gestionar tu salud.",
+    "full_name": "Nombre Completo",
+    "name_placeholder": "Juan Pérez",
+    "email": "Correo Electrónico",
+    "email_placeholder": "ejemplo@correo.com",
+    "password": "Contraseña",
+    "confirm_password": "Confirmar Contraseña",
+    "password_placeholder": "••••••••",
+    "register_button": "REGISTRARSE",
+    "already_have_account": "¿Ya tienes una cuenta? ",
+    "login_link": "Iniciar Sesión",
+    "error_empty_fields": "Por favor completa todos los campos",
+    "error_password_match": "Las contraseñas no coinciden"
   }
 }
