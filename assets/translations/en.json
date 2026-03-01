@@ -77,17 +77,34 @@
   "register": {
     "title": "Create Account",
     "subtitle": "Create an account to start managing your health.",
-    "full_name": "Full Name",
-    "name_placeholder": "John Doe",
+    "name": "Full Name",
+    "name_placeholder": "Enter your full name",
     "email": "Email Address",
-    "email_placeholder": "name@example.com",
+    "email_placeholder": "Enter your email address",
     "password": "Password",
+    "password_placeholder": "Enter your password",
     "confirm_password": "Confirm Password",
-    "password_placeholder": "••••••••",
+    "confirm_password_placeholder": "Confirm your password",
     "register_button": "SIGN UP",
-    "already_have_account": "Already have an account?",
+    "already_have_account": "Already have an account? ",
     "login_link": "Sign In",
     "error_empty_fields": "Please complete all fields",
-    "error_password_match": "Passwords do not match"
+    "error_password_match": "Passwords do not match",
+    "register_success": "Registration successful. Please sign in."
+  },
+
+  "errors": {
+    "unknown": "Unknown error",
+    "invalid_data": "Invalid data: {}",
+    "invalid_credentials": "Invalid credentials",
+    "endpoint_not_found": "Endpoint not found",
+    "server_error": "Server error",
+    "http_error": "HTTP error {}: {}",
+    "timeout": "Request timed out. Please try again.",
+    "connection_error": "Connection error. Check your internet.",
+    "network_error": "Network error: {}",
+    "unexpected_error": "Unexpected error: {}",
+    "user_already_exists": "User already exists",
+    "connection_error_generic": "Connection error: {}"
   }
 }

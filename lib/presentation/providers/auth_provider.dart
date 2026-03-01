@@ -120,6 +120,19 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
+  /// Recuperar contraseña
+  Future<void> forgotPassword(String email) async {
+    state = const AuthStateLoading();
+    try {
+      final repository = ref.read(authRepositoryProvider);
+      await repository.forgotPassword(email);
+      // Tras envío exitoso, volver a unauthenticated
+      state = const AuthStateUnauthenticated();
+    } catch (e) {
+      state = AuthStateError(e.toString().replaceAll('Exception: ', ''));
+    }
+  }
+
   /// Logout - eliminar sesión
   Future<void> logout() async {
     state = const AuthStateLoading();

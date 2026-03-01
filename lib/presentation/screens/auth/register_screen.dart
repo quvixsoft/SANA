@@ -7,6 +7,7 @@ import 'package:sana/presentation/providers/auth_provider.dart';
 import 'package:sana/presentation/providers/auth_state.dart';
 import 'package:sana/presentation/widgets/buttons/primary_button.dart';
 import 'package:sana/presentation/widgets/form/text_field.dart';
+import 'package:sana/presentation/widgets/share/toast/custom_toast.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   static const String routePath = '/auth/register';
@@ -40,15 +41,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     if (_nameController.text.isEmpty ||
         _emailController.text.isEmpty ||
         _passwordController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('register.error_empty_fields'.tr())),
+      CustomToast.show(
+        context: context,
+        message: 'register.error_empty_fields'.tr(),
+        type: ToastType.warning,
       );
       return;
     }
 
     if (_passwordController.text != _confirmPasswordController.text) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('register.error_password_match'.tr())),
+      CustomToast.show(
+        context: context,
+        message: 'register.error_password_match'.tr(),
+        type: ToastType.warning,
       );
       return;
     }
@@ -71,21 +76,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
     if (authState is AuthStateError) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(authState.message),
-            backgroundColor: Colors.red,
-          ),
+        CustomToast.show(
+          context: context,
+          message: authState.message,
+          type: ToastType.error,
         );
       }
     } else if (authState is AuthStateUnauthenticated) {
       // Éxito: estado vuelve a unauthenticated (sin error)
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Registro exitoso. Por favor inicia sesión.'),
-            backgroundColor: Colors.green,
-          ),
+        CustomToast.show(
+          context: context,
+          message: 'register.register_success'.tr(),
+          type: ToastType.success,
         );
         // Ir al login
         context.pop();
@@ -127,15 +130,15 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
               CustomTextField(
                 controller: _nameController,
-                label: 'register.full_name'.tr(),
-                //placeholder: 'register.name_placeholder'.tr(),
+                label: 'register.name'.tr(),
+                placeholder: 'register.name_placeholder'.tr(),
                 icon: Icons.person_outline,
               ),
               const SizedBox(height: 16),
               CustomTextField(
                 controller: _emailController,
                 label: 'register.email'.tr(),
-                //placeholder: 'register.email_placeholder'.tr(),
+                placeholder: 'register.email_placeholder'.tr(),
                 icon: Icons.email_outlined,
                 keyboardType: TextInputType.emailAddress,
               ),
@@ -143,7 +146,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               CustomTextField(
                 controller: _passwordController,
                 label: 'register.password'.tr(),
-                //placeholder: 'register.password_placeholder'.tr(),
+                placeholder: 'register.password_placeholder'.tr(),
                 icon: Icons.lock_outline,
                 isPassword: true,
                 isVisible: _isPasswordVisible,
@@ -157,7 +160,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               CustomTextField(
                 controller: _confirmPasswordController,
                 label: 'register.confirm_password'.tr(),
-                //placeholder: 'register.password_placeholder'.tr(),
+                placeholder: 'register.confirm_password_placeholder'.tr(),
                 icon: Icons.lock_outline,
                 isPassword: true,
                 isVisible: _isConfirmPasswordVisible,

@@ -1,21 +1,28 @@
 import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sana/core/config/theme/app_theme.dart';
+import 'package:sana/presentation/providers/auth_provider.dart';
+import 'package:sana/presentation/providers/auth_state.dart';
 import 'package:sana/presentation/widgets/buttons/primary_button.dart';
+import 'package:sana/presentation/widgets/form/text_field.dart';
+import 'package:sana/presentation/widgets/share/toast/custom_toast.dart';
 
-class ForgotPasswordScreen extends StatefulWidget {
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
   static const String routePath = '/auth/forgot-password';
   static const String routeName = 'forgot-password';
 
   const ForgotPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final TextEditingController _emailController = TextEditingController();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -23,19 +30,48 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     super.dispose();
   }
 
-  void _handleSendInstructions() {
-    if (_emailController.text.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('forgot-password.valid_email'.tr())),
+  Future<void> _handleSendInstructions() async {
+    if (_emailController.text.trim().isEmpty) {
+      CustomToast.show(
+        context: context,
+        message: 'forgot-password.valid_email'.tr(),
+        type: ToastType.warning,
       );
       return;
     }
 
-    // Mock logic
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('forgot-password.forgot-button-message'.tr())),
-    );
-    context.pop();
+    setState(() => _isLoading = true);
+
+    try {
+      await ref
+          .read(authNotifierProvider.notifier)
+          .forgotPassword(_emailController.text.trim());
+
+      final authState = ref.read(authNotifierProvider);
+
+      if (authState is AuthStateUnauthenticated) {
+        if (mounted) {
+          CustomToast.show(
+            context: context,
+            message: 'forgot-password.forgot-button-message'.tr(),
+            type: ToastType.success,
+          );
+          context.pop();
+        }
+      } else if (authState is AuthStateError) {
+        if (mounted) {
+          CustomToast.show(
+            context: context,
+            message: authState.message,
+            type: ToastType.error,
+          );
+        }
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
+    }
   }
 
   @override
@@ -67,70 +103,29 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               const SizedBox(height: 48),
 
-              _buildTextField(
+              CustomTextField(
                 controller: _emailController,
                 label: 'forgot-password.email'.tr(),
                 placeholder: 'forgot-password.email_placeholder'.tr(),
                 icon: Icons.email_outlined,
+                keyboardType: TextInputType.emailAddress,
               ),
 
               const SizedBox(height: 32),
 
-              SizedBox(
-                width: double.infinity,
-                child: PrimaryButton(
-                  text: 'forgot-password.title'.tr(),
-                  onPressed: _handleSendInstructions,
-                  icon: Icons.arrow_forward,
-                  expand: true,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 32,
-                    vertical: 20,
-                  ),
+              PrimaryButton(
+                text: 'forgot-password.forgot-button'.tr(),
+                onPressed: _isLoading ? null : _handleSendInstructions,
+                icon: Icons.arrow_forward,
+                expand: true,
+                isLoading: _isLoading,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 32,
+                  vertical: 20,
                 ),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String placeholder,
-    required IconData icon,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.large),
-        border: Border.all(color: AppColors.grey200),
-        boxShadow: AppShadows.subtle,
-      ),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w900,
-            color: AppColors.grey,
-            letterSpacing: 1,
-          ),
-          hintText: placeholder,
-          hintStyle: const TextStyle(
-            fontWeight: FontWeight.w500,
-            color: AppColors.darkNavy,
-          ),
-          prefixIcon: Icon(icon, color: AppColors.grey300),
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-          floatingLabelBehavior: FloatingLabelBehavior.always,
         ),
       ),
     );
