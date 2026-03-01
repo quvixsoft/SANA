@@ -21,6 +21,7 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
+  final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   bool _isLoading = false;
 
@@ -30,13 +31,20 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     super.dispose();
   }
 
+  /// Validación de email
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'forgot-password.email_required'.tr();
+    }
+    final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value)) {
+      return 'forgot-password.email_invalid'.tr();
+    }
+    return null;
+  }
+
   Future<void> _handleSendInstructions() async {
-    if (_emailController.text.trim().isEmpty) {
-      CustomToast.show(
-        context: context,
-        message: 'forgot-password.valid_email'.tr(),
-        type: ToastType.warning,
-      );
+    if (!_formKey.currentState!.validate()) {
       return;
     }
 
@@ -89,42 +97,48 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(32.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'forgot-password.title'.tr(),
-                style: AppTextStyles.h1.copyWith(color: AppColors.darkNavy),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                'forgot-password.description'.tr(),
-                style: AppTextStyles.bodyLarge.copyWith(color: AppColors.grey),
-              ),
-              const SizedBox(height: 48),
-
-              CustomTextField(
-                controller: _emailController,
-                label: 'forgot-password.email'.tr(),
-                placeholder: 'forgot-password.email_placeholder'.tr(),
-                icon: Icons.email_outlined,
-                keyboardType: TextInputType.emailAddress,
-              ),
-
-              const SizedBox(height: 32),
-
-              PrimaryButton(
-                text: 'forgot-password.forgot-button'.tr(),
-                onPressed: _isLoading ? null : _handleSendInstructions,
-                icon: Icons.arrow_forward,
-                expand: true,
-                isLoading: _isLoading,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 20,
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'forgot-password.title'.tr(),
+                  style: AppTextStyles.h1.copyWith(color: AppColors.darkNavy),
                 ),
-              ),
-            ],
+                const SizedBox(height: 12),
+                Text(
+                  'forgot-password.description'.tr(),
+                  style: AppTextStyles.bodyLarge.copyWith(
+                    color: AppColors.grey,
+                  ),
+                ),
+                const SizedBox(height: 48),
+
+                CustomTextField(
+                  controller: _emailController,
+                  label: 'forgot-password.email'.tr(),
+                  placeholder: 'forgot-password.email_placeholder'.tr(),
+                  icon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: _validateEmail,
+                ),
+
+                const SizedBox(height: 32),
+
+                PrimaryButton(
+                  text: 'forgot-password.forgot-button'.tr(),
+                  onPressed: _isLoading ? null : _handleSendInstructions,
+                  icon: Icons.arrow_forward,
+                  expand: true,
+                  isLoading: _isLoading,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 32,
+                    vertical: 20,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
