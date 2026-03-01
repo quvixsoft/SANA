@@ -62,12 +62,9 @@ class AuthNotifier extends Notifier<AuthState> {
   /// Login con email y password
   Future<void> login(String email, String password) async {
     state = const AuthStateLoading();
-    debugPrint('email: $email');
-    debugPrint('password: $password');
     try {
       final repository = ref.read(authRepositoryProvider);
       final loginResponse = await repository.login(email, password);
-      debugPrint('loginResponse: $loginResponse');
       // Guardar tokens y datos del usuario
       final storage = ref.read(secureStorageProvider);
       await storage.saveAccessToken(loginResponse.accessToken);
@@ -133,13 +130,15 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
-  /// Logout - eliminar sesión
+  /// Logout - eliminar solo datos de sesión
+  /// Preserva flags como onboarding_completed y biometría
   Future<void> logout() async {
     state = const AuthStateLoading();
 
     try {
       final storage = ref.read(secureStorageProvider);
-      await storage.clearAll();
+      await storage.clearTokens();
+      await storage.clearUserData();
       state = const AuthStateUnauthenticated();
     } catch (e) {
       state = AuthStateError('Error al cerrar sesión: $e');
