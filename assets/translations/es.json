@@ -8,15 +8,15 @@
     "next": "Siguiente",
     "step1": {
       "title": "Bienvenido a SANA",
-      "description": "Tu Asistente de Salud, Diagnósticos rápidos, precisos y personalizados."
+      "description": "Encontramos la causa real de tus síntomas"
     },
     "step2": {
-      "title": "Describe tus Síntomas",
-      "description": "Chatea con nuestra IA. Responde preguntas sencillas para el análisis preliminar."
+      "title": "Nuestro Método",
+      "description": "Cruzamos tus palabras con la evidencia de tus laboratorios."
     },
     "step3": {
-      "title": "Obtén Recomendaciones",
-      "description": "Recibe orientación y asesoría. No reemplaza un médico, pero da información valiosa."
+      "title": "Lo que debes saber antes de empezar",
+      "description": "SANA es una herramienta de analisis de datos. Este reporte no sustituye la opinion tecnica de un profesional de la salud."
     }
   },
 
@@ -24,13 +24,11 @@
     "title": "Iniciar Sesión",
     "subtitle": "¡Bienvenido de nuevo! Inicia sesión para continuar.",
     "email": "Correo Electrónico",
-    "email_hint": "nombre@ejemplo.com",
-    "email_placeholder": "nombre@ejemplo.com",
+    "email_placeholder": "Ingresa tu correo electrónico",
     "email_required": "El correo es requerido",
     "email_invalid": "Por favor ingresa un correo válido",
     "password": "Contraseña",
-    "password_hint": "Ingresa tu contraseña",
-    "password_placeholder": "••••••••",
+    "password_placeholder": "Ingresa tu contraseña",
     "password_required": "La contraseña es requerida",
     "password_min_length": "La contraseña debe tener al menos 8 caracteres",
     "forgot_password": "¿Olvidaste tu contraseña?",
@@ -48,7 +46,19 @@
     "enable_biometric_message": "¿Quieres usar tu huella para iniciar sesión la próxima vez?",
     "yes_enable": "Sí, activar",
     "no": "No",
-    "login_success": "Login exitoso"
+    "login_success": "Login exitoso",
+    "remember_me": "Recuérdame",
+    "biometric_device_not_supported": "Tu dispositivo no soporta autenticación biométrica",
+    "biometric_activate_reason": "Autentícate para activar el inicio de sesión con huella",
+    "biometric_scan_reason": "Escanee su huella digital para autenticarse",
+    "biometric_modal_title": "Autenticación Biométrica",
+    "biometric_about_title": "Acerca de la Autenticación Biométrica",
+    "biometric_about_content": "La autenticación biométrica es una alternativa que le permite iniciar sesión de manera rápida y segura, utilizando (dependiendo de su dispositivo móvil) su huella dactilar como método de acceso.",
+    "biometric_status_disabled": "Desactivada: Indica que no se ha activado la opción de autenticación biométrica.",
+    "biometric_status_pending": "Esperando credenciales: Indica que se activó la autenticación biométrica.\n\nPara finalizar el proceso de activación, debe iniciar sesión con sus credenciales y a continuación deberá introducir su huella dactilar.",
+    "biometric_status_active": "Activada: La autenticación biométrica está activa y lista para ser usada. Presione el botón de huella dactilar que se habilitará para iniciar sesión.",
+    "biometric_use_toggle": "Usar Autenticación Biométrica",
+    "biometric_accept": "Aceptar"
   },
 
   "forgot-password": {

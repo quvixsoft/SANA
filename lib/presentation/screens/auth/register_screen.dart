@@ -6,6 +6,7 @@ import 'package:sana/core/config/theme/app_theme.dart';
 import 'package:sana/presentation/providers/auth_provider.dart';
 import 'package:sana/presentation/providers/auth_state.dart';
 import 'package:sana/presentation/widgets/buttons/primary_button.dart';
+import 'package:sana/presentation/widgets/form/text_field.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   static const String routePath = '/auth/register';
@@ -124,24 +125,25 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
               const SizedBox(height: 32),
 
-              _buildTextField(
+              CustomTextField(
                 controller: _nameController,
                 label: 'register.full_name'.tr(),
-                placeholder: 'register.name_placeholder'.tr(),
+                //placeholder: 'register.name_placeholder'.tr(),
                 icon: Icons.person_outline,
               ),
               const SizedBox(height: 16),
-              _buildTextField(
+              CustomTextField(
                 controller: _emailController,
                 label: 'register.email'.tr(),
-                placeholder: 'register.email_placeholder'.tr(),
+                //placeholder: 'register.email_placeholder'.tr(),
                 icon: Icons.email_outlined,
+                keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: 16),
-              _buildTextField(
+              CustomTextField(
                 controller: _passwordController,
                 label: 'register.password'.tr(),
-                placeholder: 'register.password_placeholder'.tr(),
+                //placeholder: 'register.password_placeholder'.tr(),
                 icon: Icons.lock_outline,
                 isPassword: true,
                 isVisible: _isPasswordVisible,
@@ -152,10 +154,10 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                 },
               ),
               const SizedBox(height: 16),
-              _buildTextField(
+              CustomTextField(
                 controller: _confirmPasswordController,
                 label: 'register.confirm_password'.tr(),
-                placeholder: 'register.password_placeholder'.tr(),
+                //placeholder: 'register.password_placeholder'.tr(),
                 icon: Icons.lock_outline,
                 isPassword: true,
                 isVisible: _isConfirmPasswordVisible,
@@ -198,59 +200,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String placeholder,
-    required IconData icon,
-    bool isPassword = false,
-    bool isVisible = false,
-    VoidCallback? onVisibilityChanged,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(AppRadius.large),
-        border: Border.all(color: AppColors.grey200),
-        boxShadow: AppShadows.subtle,
-      ),
-      child: TextField(
-        controller: controller,
-        obscureText: isPassword && !isVisible,
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w900,
-            color: AppColors.grey,
-            letterSpacing: 1,
-          ),
-          hintText: placeholder,
-          hintStyle: const TextStyle(
-            fontWeight: FontWeight.w500,
-            color: AppColors.darkNavy,
-          ),
-          prefixIcon: Icon(icon, color: AppColors.grey300),
-          suffixIcon: isPassword
-              ? IconButton(
-                  icon: Icon(
-                    isVisible ? Icons.visibility : Icons.visibility_off,
-                    color: AppColors.grey,
-                  ),
-                  onPressed: onVisibilityChanged,
-                )
-              : null,
-          border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 16,
-          ),
-          floatingLabelBehavior: FloatingLabelBehavior.always,
         ),
       ),
     );

@@ -1,10 +1,22 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:sana/core/config/theme/app_theme.dart';
+import 'package:sana/presentation/screens/dashboard/chat/chat.dart';
+import 'package:sana/presentation/widgets/home/empty_analysis_widget.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   static const String routePath = '/';
   static const String routeName = 'home';
 
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  // TODO: reemplazar con lógica real (provider / API) para saber si tiene análisis
+  final bool hasAnalyses = false;
 
   @override
   Widget build(BuildContext context) {
@@ -13,220 +25,216 @@ class HomeScreen extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // ── Header (siempre visible) ──
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: const [
-                  Text(
-                    'Hola, Armando',
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w900,
-                      letterSpacing: -1,
-                      color: Color(0xFF122640),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text(
+                      'Hola, Armando',
+                      style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w900,
+                        letterSpacing: -1,
+                        color: AppColors.darkNavy,
+                      ),
                     ),
-                  ),
-                  Text(
-                    '¿Cómo te sientes hoy?',
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
+                    Text(
+                      hasAnalyses
+                          ? '¿Cómo te sientes hoy?'
+                          : 'Tu expediente está vacío',
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
-                ),
-                child: const Icon(
-                  Icons.notifications_none,
-                  color: Color(0xFF122640),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 32),
+          // ── Conditional content ──
+          if (!hasAnalyses)
+            EmptyAnalysisWidget(
+              onStartAnalysis: () {
+                context.go(Chat.routePath);
+              },
+            )
+          else ...[
+            const SizedBox(height: 32),
 
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            height: 56,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Row(
-              children: [
-                const Icon(Icons.search, color: Colors.grey),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    'Buscar síntomas, reportes...',
-                    style: TextStyle(
-                      color: Colors.grey[400],
-                      fontWeight: FontWeight.w500,
+            // Search bar
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              height: 56,
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.search, color: Colors.grey),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Buscar síntomas, reportes...',
+                      style: TextStyle(
+                        color: Colors.grey[400],
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
-                ),
-                const Icon(Icons.mic, color: Color(0xFF1E82D9)),
-              ],
-            ),
-          ),
-
-          const SizedBox(height: 32),
-
-          // Updated AI Card with better styling for the robot/image
-          Container(
-            width: double.infinity,
-            padding: const EdgeInsets.all(24),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF1E82D9), Color(0xFF122640)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
+                  const Icon(Icons.mic, color: AppColors.primary),
+                ],
               ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: const Color(0xFF1E82D9).withOpacity(0.3),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
+
+            const SizedBox(height: 32),
+
+            // AI Card
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                gradient: const LinearGradient(
+                  colors: [AppColors.primary, AppColors.darkNavy],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(24),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.primary.withOpacity(0.3),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Text(
+                            'NUEVA CONSULTA',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                            ),
+                          ),
                         ),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: const Text(
-                          'NUEVA CONSULTA',
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Inicia tu análisis clínico con IA',
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 10,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
+                            height: 1.2,
                           ),
                         ),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Inicia tu análisis clínico con IA',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          height: 1.2,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          foregroundColor: const Color(0xFF1E82D9),
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 12,
+                        const SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () {},
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: AppColors.primary,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 20,
+                              vertical: 12,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
+                          child: const Text(
+                            'COMENZAR',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w900,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
-                        child: const Text(
-                          'COMENZAR',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w900,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                // Simplified visual representation using Icons instead of complex overlapping that might break
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Center(
-                    child: Icon(
-                      Icons.psychology,
-                      size: 40,
-                      color: Colors.white,
+                      ],
                     ),
                   ),
-                ),
-              ],
+                  Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.psychology,
+                        size: 40,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
 
-          const SizedBox(height: 32),
+            const SizedBox(height: 32),
 
-          const Text(
-            'Consejos de Salud',
-            style: TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF122640),
+            const Text(
+              'Consejos de Salud',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: AppColors.darkNavy,
+              ),
             ),
-          ),
 
-          const SizedBox(height: 16),
+            const SizedBox(height: 16),
 
-          _buildHealthTipCard(
-            "Mantén tu corazón sano",
-            "Realiza 30 minutos de cardio al día para reducir el riesgo cardiovascular.",
-            Icons.favorite,
-            const Color(0xFFE91E63),
-          ),
-          const SizedBox(height: 16),
-          _buildHealthTipCard(
-            "Hidratación correcta",
-            "Bebe al menos 8 vasos de agua para mantener tus funciones vitales óptimas.",
-            Icons.water_drop,
-            const Color(0xFF2196F3),
-          ),
-          const SizedBox(height: 16),
-          _buildHealthTipCard(
-            "Alimentación balanceada",
-            "Incorpora más vegetales verdes en tu dieta diaria.",
-            Icons.restaurant,
-            const Color(0xFF4CAF50),
-          ),
+            _buildHealthTipCard(
+              "Mantén tu corazón sano",
+              "Realiza 30 minutos de cardio al día para reducir el riesgo cardiovascular.",
+              Icons.favorite,
+              const Color(0xFFE91E63),
+            ),
+            const SizedBox(height: 16),
+            _buildHealthTipCard(
+              "Hidratación correcta",
+              "Bebe al menos 8 vasos de agua para mantener tus funciones vitales óptimas.",
+              Icons.water_drop,
+              const Color(0xFF2196F3),
+            ),
+            const SizedBox(height: 16),
+            _buildHealthTipCard(
+              "Alimentación balanceada",
+              "Incorpora más vegetales verdes en tu dieta diaria.",
+              Icons.restaurant,
+              const Color(0xFF4CAF50),
+            ),
+          ],
         ],
       ),
     );
