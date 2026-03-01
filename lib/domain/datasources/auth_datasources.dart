@@ -12,4 +12,5 @@ abstract class AuthDatasource {
     bool disclaimerAccepted,
     int roleId,
   );
+  Future<void> forgotPassword(String email);
 }

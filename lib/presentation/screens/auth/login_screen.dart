@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:sana/presentation/widgets/share/toast/custom_toast.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:sana/core/config/theme/app_theme.dart';
 import 'package:sana/core/helpers/encryption_helper.dart';
@@ -10,7 +11,6 @@ import 'package:sana/presentation/screens/dashboard/home/home_screen.dart';
 import 'package:sana/presentation/providers/auth_provider.dart';
 import 'package:sana/presentation/providers/auth_state.dart';
 import 'package:sana/presentation/widgets/form/text_field.dart';
-import 'package:sana/presentation/widgets/share/snackBar/customSnackBar.dart';
 
 import 'package:easy_localization/easy_localization.dart';
 import 'package:go_router/go_router.dart';
@@ -97,10 +97,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> saveCredentialsBiometric() async {
     if (supportState == _SupportState.unknown) {
       if (mounted) {
-        CustomSnackBar.show(
+        CustomToast.show(
           context: context,
           message: 'login.biometric_device_not_supported'.tr(),
-          backgroundColor: Colors.red.shade700,
+          type: ToastType.error,
         );
       }
       return;
@@ -141,8 +141,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
           final user = await EncryptionHelper.readEncrypted('username') ?? '';
           final pass = await EncryptionHelper.readEncrypted('password') ?? '';
 
-          debugPrint('user: $user');
-          debugPrint('pass: $pass');
           await ref.read(authNotifierProvider.notifier).login(user, pass);
           // Escuchar el estado para manejar éxito/error
           final authState = ref.read(authNotifierProvider);
@@ -202,17 +200,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 .changeFingerprintColor(colorFingPrint: Colors.green);
           }
         }
-
         // Navegar al home
         if (mounted) {
           context.go(HomeScreen.routePath);
         }
       } else if (authState is AuthStateError) {
         if (!mounted) return;
-        CustomSnackBar.show(
+        CustomToast.show(
           context: context,
-          message: authState.message,
-          backgroundColor: Colors.red.shade700,
+          message: authState.message.toString(),
+          type: ToastType.error,
         );
       }
     } finally {
@@ -286,14 +283,6 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final biometricColor = ref.watch(toogleBiometricProvider).colorFingPrint;
-    // Escuchar cambios en el estado de autenticación
-    ref.listen<AuthState>(authNotifierProvider, (previous, next) {
-      if (next is AuthStateError) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(next.message), backgroundColor: Colors.red),
-        );
-      }
-    });
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F7FA),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:sana/core/services/secure_storage_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sana/core/config/theme/app_theme.dart';
 import 'package:sana/presentation/widgets/buttons/primary_button.dart';
 import 'package:sana/presentation/screens/auth/login_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:sana/presentation/widgets/share/selector/language_selector.dart';
 
@@ -41,6 +41,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     },
   ];
 
+  Future<void> _completeOnboarding() async {
+    final storage = SecureStorageService();
+    await storage.saveOnboardingComplete();
+    if (mounted) {
+      context.go(LoginScreen.routePath);
+    }
+  }
+
   void _handleNext() async {
     if (_currentStep < _steps.length - 1) {
       _pageController.nextPage(
@@ -48,12 +56,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         curve: Curves.easeIn,
       );
     } else {
-      // Mark onboarding as completed
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('has_completed_onboarding', true);
-      if (mounted) {
-        context.go(LoginScreen.routePath);
-      }
+      await _completeOnboarding();
     }
   }
 
@@ -232,8 +235,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             TextButton(
-                              onPressed: () =>
-                                  context.go(LoginScreen.routePath),
+                              onPressed: _completeOnboarding,
                               child: Text(
                                 'onboarding.skip'.tr(),
                                 style: const TextStyle(

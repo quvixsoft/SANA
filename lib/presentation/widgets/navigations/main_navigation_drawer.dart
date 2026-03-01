@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sana/core/config/theme/app_theme.dart';
-import 'package:sana/data/data_manager.dart';
+import 'package:sana/presentation/providers/auth_provider.dart';
+import 'package:sana/presentation/providers/auth_state.dart';
+import 'package:sana/presentation/screens/auth/login_screen.dart';
 import 'package:sana/presentation/screens/dashboard/home/home_screen.dart';
 
-class MainNavigationDrawer extends StatelessWidget {
+class MainNavigationDrawer extends ConsumerWidget {
   const MainNavigationDrawer({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final dataManager = DataManager();
-    final user = dataManager.userProfile;
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authNotifierProvider);
+    final userName = authState is AuthStateAuthenticated
+        ? authState.user.name
+        : 'Usuario';
+    final userEmail = authState is AuthStateAuthenticated
+        ? authState.user.email
+        : '';
 
     return Drawer(
       backgroundColor: AppColors.background,
@@ -31,10 +39,10 @@ class MainNavigationDrawer extends StatelessWidget {
                     ),
                   ),
                   accountName: Text(
-                    user?.name ?? 'Armando el Vampi',
+                    userName,
                     style: const TextStyle(fontWeight: FontWeight.bold),
                   ),
-                  accountEmail: const Text('armando@vampi.com'),
+                  accountEmail: Text(userEmail),
                   otherAccountsPictures: const [
                     Icon(Icons.notifications_active, color: Colors.white),
                   ],
@@ -84,9 +92,12 @@ class MainNavigationDrawer extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            onTap: () {
-              context.pop();
-              context.go('/auth/login');
+            onTap: () async {
+              context.pop(); // Cerrar drawer
+              await ref.read(authNotifierProvider.notifier).logout();
+              if (context.mounted) {
+                context.go(LoginScreen.routePath);
+              }
             },
           ),
           const SizedBox(height: 16),

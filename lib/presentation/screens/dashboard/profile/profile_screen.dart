@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:sana/data/data_manager.dart';
+import 'package:sana/presentation/providers/auth_provider.dart';
+import 'package:sana/presentation/providers/auth_state.dart';
+import 'package:sana/presentation/screens/auth/login_screen.dart';
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends ConsumerWidget {
   static const String routePath = '/profile';
   static const String routeName = 'profile';
 
@@ -10,7 +15,11 @@ class ProfileScreen extends StatelessWidget {
   ProfileScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authNotifierProvider);
+    final userName = authState is AuthStateAuthenticated
+        ? authState.user.name
+        : _dataManager.userProfile?.name ?? 'Usuario';
     return SingleChildScrollView(
       padding: const EdgeInsets.only(left: 20, right: 20, top: 40, bottom: 120),
       child: Column(
@@ -70,7 +79,7 @@ class ProfileScreen extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               Text(
-                _dataManager.userProfile?.name ?? 'Usuario',
+                userName,
                 style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.w900,
@@ -212,7 +221,17 @@ class ProfileScreen extends StatelessWidget {
                   subtitle: 'Automático',
                 ),
                 const Divider(height: 1, indent: 20, endIndent: 20),
-                _buildConfigItem(Icons.logout, 'Cerrar Sesión', isDanger: true),
+                _buildConfigItem(
+                  Icons.logout,
+                  'Cerrar Sesión',
+                  isDanger: true,
+                  onTap: () async {
+                    await ref.read(authNotifierProvider.notifier).logout();
+                    if (context.mounted) {
+                      context.go(LoginScreen.routePath);
+                    }
+                  },
+                ),
               ],
             ),
           ),

@@ -12,6 +12,7 @@ class SecureStorageService {
   static const String _accessTokenKey = 'access_token';
   static const String _refreshTokenKey = 'refresh_token';
   static const String _userDataKey = 'user_data';
+  static const String _onboardingKey = 'onboarding_completed';
 
   /// Guarda el access token
   Future<void> saveAccessToken(String token) async {
@@ -52,5 +53,21 @@ class SecureStorageService {
   Future<void> clearTokens() async {
     await _storage.delete(key: _accessTokenKey);
     await _storage.delete(key: _refreshTokenKey);
+  }
+
+  /// Elimina solo los datos del usuario
+  Future<void> clearUserData() async {
+    await _storage.delete(key: _userDataKey);
+  }
+
+  /// Marca el onboarding como completado
+  Future<void> saveOnboardingComplete() async {
+    await _storage.write(key: _onboardingKey, value: 'true');
+  }
+
+  /// Verifica si el onboarding ya fue completado
+  Future<bool> isOnboardingCompleted() async {
+    final value = await _storage.read(key: _onboardingKey);
+    return value == 'true';
   }
 }

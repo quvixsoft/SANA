@@ -1,3 +1,4 @@
+import 'package:sana/core/services/secure_storage_service.dart';
 import 'package:go_router/go_router.dart';
 import 'package:sana/presentation/layouts/app_layout.dart';
 import 'package:sana/presentation/layouts/auth_layout.dart';
@@ -13,11 +14,47 @@ import 'package:sana/presentation/screens/onboarding/onboarding_screen.dart';
 
 final appRouter = GoRouter(
   initialLocation: '/onboarding',
+  redirect: (context, state) async {
+    final path = state.matchedLocation;
+    final storage = SecureStorageService();
+
+    // Rutas que no requieren autenticación
+    final isAuthRoute = path.startsWith('/auth') || path == '/onboarding';
+
+    // 1. Verificar si ya vio el onboarding
+    if (path == '/onboarding') {
+      final onboardingCompleted = await storage.isOnboardingCompleted();
+      if (!onboardingCompleted) {
+        return null; // Mostrar onboarding
+      }
+    }
+
+    // 2. Verificar si hay sesión activa
+    final accessToken = await storage.getAccessToken();
+    final hasSession = accessToken != null && accessToken.isNotEmpty;
+
+    if (hasSession && isAuthRoute) {
+      // Tiene sesión y está en una ruta de auth → ir al home
+      return HomeScreen.routePath;
+    }
+
+    if (!hasSession && !isAuthRoute) {
+      // No tiene sesión y está en una ruta protegida → ir al login
+      return LoginScreen.routePath;
+    }
+
+    // 3. Si viene del onboarding completado y no tiene sesión → ir al login
+    if (path == '/onboarding') {
+      return LoginScreen.routePath;
+    }
+
+    return null; // No redirigir
+  },
   routes: [
     GoRoute(
       path: '/onboarding',
       name: OnboardingScreen.name,
-      builder: (context, state) => OnboardingScreen(),
+      builder: (context, state) => const OnboardingScreen(),
     ),
 
     /// StatefulShellRoute para autenticación (Login, Registro)

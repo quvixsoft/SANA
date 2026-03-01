@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:sana/core/config/network/adapters/http_implementer.dart';
 import 'package:sana/domain/datasources/auth_datasources.dart';
@@ -27,30 +28,32 @@ class AuthApiSanaDatasource extends AuthDatasource {
       // Manejo de errores específicos de Dio
       if (e.response != null) {
         final statusCode = e.response!.statusCode;
-        final message = e.response!.data['message'] ?? 'Error desconocido';
+        final message = e.response!.data['message'] ?? 'errors.unknown'.tr();
 
         switch (statusCode) {
           case 400:
-            throw Exception('Datos inválidos: $message');
+            throw Exception('errors.invalid_data'.tr(args: ['$message']));
           case 401:
-            throw Exception('Credenciales incorrectas');
+            throw Exception('errors.invalid_credentials'.tr());
           case 404:
-            throw Exception('Endpoint no encontrado');
+            throw Exception('errors.endpoint_not_found'.tr());
           case 500:
-            throw Exception('Error del servidor');
+            throw Exception('errors.server_error'.tr());
           default:
-            throw Exception('Error HTTP $statusCode: $message');
+            throw Exception(
+              'errors.http_error'.tr(args: ['$statusCode', '$message']),
+            );
         }
       } else if (e.type == DioExceptionType.connectionTimeout ||
           e.type == DioExceptionType.receiveTimeout) {
-        throw Exception('Tiempo de espera agotado. Verifica tu conexión.');
+        throw Exception('errors.timeout'.tr());
       } else if (e.type == DioExceptionType.connectionError) {
-        throw Exception('Error de conexión. Verifica tu internet.');
+        throw Exception('errors.connection_error'.tr());
       } else {
-        throw Exception('Error de red: ${e.message}');
+        throw Exception('errors.network_error'.tr(args: ['${e.message}']));
       }
     } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw Exception('errors.unexpected_error'.tr(args: ['$e']));
     }
   }
 
@@ -85,7 +88,7 @@ class AuthApiSanaDatasource extends AuthDatasource {
     } on DioException catch (e) {
       if (e.response != null) {
         final statusCode = e.response!.statusCode;
-        final message = e.response!.data['message'] ?? 'Error desconocido';
+        final message = e.response!.data['message'] ?? 'errors.unknown'.tr();
 
         if (statusCode == 400 && message is List) {
           throw Exception(message.join(', '));
@@ -93,19 +96,61 @@ class AuthApiSanaDatasource extends AuthDatasource {
 
         switch (statusCode) {
           case 400:
-            throw Exception('Datos inválidos: $message');
+            throw Exception('errors.invalid_data'.tr(args: ['$message']));
           case 409:
-            throw Exception('El usuario ya existe');
+            throw Exception('errors.user_already_exists'.tr());
           case 500:
-            throw Exception('Error del servidor');
+            throw Exception('errors.server_error'.tr());
           default:
-            throw Exception('Error HTTP $statusCode: $message');
+            throw Exception(
+              'errors.http_error'.tr(args: ['$statusCode', '$message']),
+            );
         }
       } else {
-        throw Exception('Error de conexión: ${e.message}');
+        throw Exception(
+          'errors.connection_error_generic'.tr(args: ['${e.message}']),
+        );
       }
     } catch (e) {
-      throw Exception('Error inesperado: $e');
+      throw Exception('errors.unexpected_error'.tr(args: ['$e']));
+    }
+  }
+
+  @override
+  Future<void> forgotPassword(String email) async {
+    try {
+      await HttpImplementer.post<Map<String, dynamic>>(
+        connection,
+        '/auth/forgot-password',
+        data: {'email': email},
+      );
+    } on DioException catch (e) {
+      if (e.response != null) {
+        final statusCode = e.response!.statusCode;
+        final message = e.response!.data['message'] ?? 'errors.unknown'.tr();
+
+        switch (statusCode) {
+          case 400:
+            throw Exception('errors.invalid_data'.tr(args: ['$message']));
+          case 404:
+            throw Exception('errors.endpoint_not_found'.tr());
+          case 500:
+            throw Exception('errors.server_error'.tr());
+          default:
+            throw Exception(
+              'errors.http_error'.tr(args: ['$statusCode', '$message']),
+            );
+        }
+      } else if (e.type == DioExceptionType.connectionTimeout ||
+          e.type == DioExceptionType.receiveTimeout) {
+        throw Exception('errors.timeout'.tr());
+      } else if (e.type == DioExceptionType.connectionError) {
+        throw Exception('errors.connection_error'.tr());
+      } else {
+        throw Exception('errors.network_error'.tr(args: ['${e.message}']));
+      }
+    } catch (e) {
+      throw Exception('errors.unexpected_error'.tr(args: ['$e']));
     }
   }
 }
