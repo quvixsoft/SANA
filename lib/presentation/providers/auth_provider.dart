@@ -88,30 +88,43 @@ class AuthNotifier extends Notifier<AuthState> {
     }
   }
 
-  /// Registro de usuario
+  /// Registro de usuario con login automático
   Future<void> register({
     required String email,
     required String password,
     required String name,
-    required String birthDate,
     required bool disclaimerAccepted,
     required int roleId,
   }) async {
     state = const AuthStateLoading();
     try {
       final repository = ref.read(authRepositoryProvider);
-      await repository.register(
+      final loginResponse = await repository.register(
         email,
         password,
         name,
-        birthDate,
         disclaimerAccepted,
         roleId,
       );
-      // Tras registro exitoso, no autenticamos automáticamente según requerimiento.
-      // El estado vuelve a Unauthenticated para que el usuario haga login.
-      // Opcionalmente podríamos hacer login automático aquí si se desea.
-      state = const AuthStateUnauthenticated();
+
+      // Guardar tokens y datos del usuario (igual que en login)
+      final storage = ref.read(secureStorageProvider);
+      await storage.saveAccessToken(loginResponse.accessToken);
+      await storage.saveRefreshToken(loginResponse.refreshToken);
+      await storage.saveUserData(
+        jsonEncode({
+          'id': loginResponse.user.id,
+          'email': loginResponse.user.email,
+          'name': loginResponse.user.name,
+          'role': loginResponse.user.role,
+        }),
+      );
+
+      // Autenticar automáticamente tras registro exitoso
+      state = AuthStateAuthenticated(
+        user: loginResponse.user,
+        accessToken: loginResponse.accessToken,
+      );
     } catch (e) {
       state = AuthStateError(e.toString().replaceAll('Exception: ', ''));
     }

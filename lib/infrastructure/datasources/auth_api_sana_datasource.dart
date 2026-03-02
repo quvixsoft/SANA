@@ -58,15 +58,15 @@ class AuthApiSanaDatasource extends AuthDatasource {
   }
 
   @override
-  Future<User> register(
+  Future<Login> register(
     String email,
     String password,
     String name,
-    String birthDate,
     bool disclaimerAccepted,
     int roleId,
   ) async {
     try {
+      // 1. Registrar al usuario
       final response = await HttpImplementer.post<Map<String, dynamic>>(
         connection,
         '/users',
@@ -74,17 +74,14 @@ class AuthApiSanaDatasource extends AuthDatasource {
           'email': email,
           'password': password,
           'name': name,
-          'birthDate': birthDate,
           'disclaimerAccepted': disclaimerAccepted,
           'roleId': roleId,
         },
       );
       debugPrint('response: API SANA REGISTER $response');
-      // Convertir respuesta JSON a modelo de usuario
-      final userModel = UserModel.fromJson(response.data!);
 
-      // Convertir modelo a entidad usando el mapper
-      return AuthMapper.userModelToEntity(userModel);
+      // 2. Login automático con las mismas credenciales
+      return await login(email, password);
     } on DioException catch (e) {
       if (e.response != null) {
         final statusCode = e.response!.statusCode;
@@ -93,7 +90,7 @@ class AuthApiSanaDatasource extends AuthDatasource {
         if (statusCode == 400 && message is List) {
           throw Exception(message.join(', '));
         }
-
+        debugPrint('El error code es : $statusCode');
         switch (statusCode) {
           case 400:
             throw Exception('errors.invalid_data'.tr(args: ['$message']));

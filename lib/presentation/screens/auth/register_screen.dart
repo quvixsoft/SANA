@@ -8,6 +8,7 @@ import 'package:sana/presentation/providers/auth_state.dart';
 import 'package:sana/presentation/widgets/buttons/primary_button.dart';
 import 'package:sana/presentation/widgets/form/text_field.dart';
 import 'package:sana/presentation/widgets/share/toast/custom_toast.dart';
+import 'package:sana/presentation/screens/dashboard/home/home_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   static const String routePath = '/auth/register';
@@ -62,8 +63,6 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           email: _emailController.text.trim(),
           password: _passwordController.text.trim(),
           name: _nameController.text.trim(),
-          birthDate: DateTime.now()
-              .toIso8601String(), // Por defecto hoy, ajustar si hay campo fecha
           disclaimerAccepted: true, // Asumimos true por ahora
           roleId: 2, // 2 = Patient/User por defecto (ajustar según backend)
         );
@@ -72,6 +71,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final authState = ref.read(authNotifierProvider);
 
     if (authState is AuthStateError) {
+      debugPrint('Error al registrar: ${authState.message}');
       if (mounted) {
         CustomToast.show(
           context: context,
@@ -79,15 +79,20 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
           type: ToastType.error,
         );
       }
-    } else if (authState is AuthStateUnauthenticated) {
-      // Éxito: estado vuelve a unauthenticated (sin error)
+    } else if (authState is AuthStateAuthenticated) {
+      // Éxito: el usuario fue registrado e inició sesión automáticamente
       if (mounted) {
         CustomToast.show(
           context: context,
           message: 'register.register_success'.tr(),
           type: ToastType.success,
         );
-        context.pop();
+        // Esperar 3 segundos para que el usuario vea el mensaje
+        await Future.delayed(const Duration(seconds: 3));
+        if (mounted) {
+          // Navegar al dashboard
+          context.go(HomeScreen.routePath);
+        }
       }
     }
 

@@ -92,7 +92,7 @@
     "login_link": "Sign In",
     "error_empty_fields": "Please complete all fields",
     "error_password_match": "Passwords do not match",
-    "register_success": "Registration successful. Please sign in.",
+    "register_success": "Registration successful! Signing in...",
     "name_required": "Name is required",
     "email_required": "Email is required",
     "email_invalid": "Enter a valid email address",
