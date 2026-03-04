@@ -91,7 +91,7 @@
     "login_link": "Iniciar Sesión",
     "error_empty_fields": "Por favor completa todos los campos",
     "error_password_match": "Las contraseñas no coinciden",
-    "register_success": "Registro exitoso. Por favor inicia sesión.",
+    "register_success": "¡Registro exitoso! Iniciando sesión...",
     "name_required": "El nombre es requerido",
     "email_required": "El correo electrónico es requerido",
     "email_invalid": "Ingresa un correo electrónico válido",

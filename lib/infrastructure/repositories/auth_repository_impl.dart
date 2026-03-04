@@ -19,11 +19,10 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<User> register(
+  Future<Login> register(
     String email,
     String password,
     String name,
-    String birthDate,
     bool disclaimerAccepted,
     int roleId,
   ) async {
@@ -32,7 +31,6 @@ class AuthRepositoryImpl implements AuthRepository {
         email,
         password,
         name,
-        birthDate,
         disclaimerAccepted,
         roleId,
       );
